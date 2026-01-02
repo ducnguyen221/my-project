@@ -169,22 +169,24 @@
       min-height: max(884px, 100dvh);
     }
   </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
   </head><body class="relative h-screen w-full overflow-hidden bg-gradient-to-br from-[var(--bg-start)] to-[var(--bg-end)] selection:bg-[var(--primary-color)] selection:text-white">
 <canvas class="absolute inset-0 z-0 pointer-events-none opacity-40" id="bgCanvas"></canvas>
 <div class="relative z-10 flex flex-col h-full max-w-[100vw] mx-auto p-4 lg:mx-[50px] lg:px-0 lg:py-4 gap-4 lg:gap-4">
 <div class="flex items-center justify-between shrink-0">
 <h1 class="text-[var(--text-color)] tracking-tight text-xl font-bold flex items-center gap-2">
 <span class="material-symbols-outlined text-[var(--accent-color)]">dashboard</span>
-                Analyst Dashboard
+                Welcome to my Profile!
             </h1>
 <div class="flex items-center gap-4">
 <button aria-label="Toggle theme" class="focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] rounded-full p-2 transition-colors duration-200" id="theme-toggle">
 <span class="material-symbols-outlined text-[var(--soft-text-color)] text-xl dark:block light:hidden">light_mode</span>
 <span class="material-symbols-outlined text-[var(--soft-text-color)] text-xl dark:hidden light:block">dark_mode</span>
 </button>
-<div class="text-xs font-medium text-[var(--soft-text-color)] tracking-widest uppercase hidden sm:block">
-                KPIM × COMPA
-            </div>
 </div>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-4 h-full min-h-0">
@@ -481,7 +483,7 @@
 <span class="material-symbols-outlined text-[var(--accent-color)]">school</span>
                             My Training Program
                         </h3>
-<div class="flex flex-col gap-2 flex-1 justify-between">
+<div class="flex flex-col gap-2 flex-1 justify-between min-h-0">
 <a class="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--card-hover-bg)] transition-colors group flex-1" href="https://kpim.vn/" target="_blank">
 <div class="w-16 h-12 overflow-hidden bg-gray-800 flex-shrink-0 rounded-none">
 <img alt="Data Analytics Course Thumbnail showing charts" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFfeeuJmaKvl6_xa4QNO45d42tgcv4_-2EuHnLzXi0hCOkiZANIeK3ePz0ZfPXBw8jMTRXhYLSoJd2nd84FL6AcmtM-CoDlee8enTQKjIuQkh9Zcs52PF-0VC4ycW2X1_xGKqBoenvlU0LAHi_VHSoboT_EsqRzhiViaS58UZSXD5WKE2dlS3Zl92dDfKOwMlucDhB7rGFyVCtCCvZFJROeEfE3iodKX5yhWWb33U-F_VWZufDLa5rmhRQe2vyRXtQYZAjyP8mwTw"/>
@@ -536,9 +538,6 @@
 </div>
 </div>
 </div>
-<div class="block sm:hidden text-center pb-4 text-xs font-medium text-[var(--soft-text-color)] uppercase tracking-widest">
-            KPIM × COMPA
-        </div>
 </div>
 <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 border border-white/10 text-white px-4 py-3 rounded-full shadow-2xl flex items-center gap-3 z-50 hidden" id="toast">
 <span class="material-symbols-outlined text-green-400 text-[20px]">check_circle</span>
