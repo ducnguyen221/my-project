@@ -1,0 +1,2287 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>Who Wants to Be a Millionaire – n8n Basic</title>
+  <style>
+    :root{
+      --bg0:#070b16;
+      --bg1:#0a1633;
+      --card:#0b1b3b;
+      --card2:#0a1530;
+      --line:rgba(255,255,255,.10);
+      --fg:#eaf1ff;
+      --muted:rgba(234,241,255,.72);
+      --muted2:rgba(234,241,255,.52);
+      --blue:#4aa3ff;
+      --blue2:#2f7dff;
+      --good:#3be28f;
+      --bad:#ff4d6d;
+      --warn:#ffd166;
+
+      --space-1:6px;
+      --space-2:10px;
+      --space-3:14px;
+      --space-4:18px;
+      --space-5:24px;
+      --radius:16px;
+      --radius2:22px;
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --shadow2: 0 10px 28px rgba(0,0,0,.45);
+      --ring: 0 0 0 3px rgba(74,163,255,.28);
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--fg);
+      background: radial-gradient(1200px 800px at 20% 10%, rgba(74,163,255,.20), transparent 55%),
+                  radial-gradient(900px 700px at 80% 15%, rgba(47,125,255,.18), transparent 55%),
+                  radial-gradient(800px 600px at 60% 95%, rgba(59,226,143,.12), transparent 60%),
+                  linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow:hidden; /* desktop no scroll */
+    }
+
+    /* subtle animated tech lines */
+    .bgfx{
+      position:fixed; inset:-40px;
+      pointer-events:none;
+      opacity:.55;
+      filter: blur(.2px);
+      background:
+        repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 1px, transparent 1px 42px),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 56px);
+      transform: translate3d(0,0,0);
+      animation: drift 14s linear infinite;
+      mask-image: radial-gradient(closest-side at 50% 25%, rgba(0,0,0,.9), rgba(0,0,0,.25) 60%, rgba(0,0,0,0) 100%);
+    }
+    @keyframes drift{
+      from{ transform: translate3d(0,0,0) }
+      to{ transform: translate3d(-60px, 35px, 0) }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .bgfx{animation:none}
+      .fade,.slide{transition:none!important}
+      .pulse{animation:none!important}
+    }
+
+    /* Layout 16:9 shell */
+    .app{
+      position:relative;
+      height:100%;
+      display:flex;
+      flex-direction:column;
+    }
+
+    header{
+      position:sticky; top:0; z-index:30;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background: linear-gradient(180deg, rgba(7,11,22,.92), rgba(7,11,22,.70));
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:12px; min-width: 260px;
+    }
+    .logo{
+      width:42px; height:42px;
+      border-radius:14px;
+      background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.25), rgba(255,255,255,.04) 55%),
+                  linear-gradient(180deg, rgba(74,163,255,.25), rgba(47,125,255,.10));
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow2);
+      display:grid; place-items:center;
+      overflow:hidden;
+    }
+    .logo svg{opacity:.95}
+    .brand h1{
+      margin:0;
+      font-size:16px;
+      letter-spacing:.2px;
+      line-height:1.1;
+    }
+    .brand p{
+      margin:2px 0 0;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .hud{
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .pill{
+      display:flex; align-items:center; gap:8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 6px 18px rgba(0,0,0,.25);
+      user-select:none;
+      white-space:nowrap;
+      font-size:13px;
+    }
+    .pill .k{color:var(--muted2); font-size:12px}
+    .pill strong{font-weight:700}
+    .dot{
+      width:8px;height:8px;border-radius:99px;background:var(--blue);
+      box-shadow: 0 0 0 3px rgba(74,163,255,.18);
+    }
+
+    .btn{
+      appearance:none;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: var(--fg);
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight:650;
+      font-size:13px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease, opacity .12s ease;
+      user-select:none;
+    }
+    .btn:hover{background: rgba(255,255,255,.09)}
+    .btn:active{transform: translateY(1px)}
+    .btn:focus-visible{outline:none; box-shadow: var(--ring)}
+    .btn.primary{
+      background: linear-gradient(180deg, rgba(74,163,255,.24), rgba(47,125,255,.16));
+      border-color: rgba(74,163,255,.28);
+    }
+    .btn.danger{
+      background: linear-gradient(180deg, rgba(255,77,109,.22), rgba(255,77,109,.10));
+      border-color: rgba(255,77,109,.26);
+    }
+    .btn.ghost{
+      background: transparent;
+      border-color: rgba(255,255,255,.12);
+    }
+    .btn:disabled{
+      opacity:.48; cursor:not-allowed; transform:none;
+    }
+
+    main{
+      flex:1;
+      min-height:0;
+      padding: var(--space-4);
+      display:grid;
+      grid-template-columns: 1.45fr .85fr;
+      gap: var(--space-4);
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      min-height:0;
+    }
+    .cardHd{
+      padding: var(--space-4);
+      border-bottom:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,0));
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: var(--space-3);
+    }
+    .cardHd .title{
+      display:flex; align-items:center; gap:10px;
+      min-width:0;
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:7px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(74,163,255,.12);
+      border: 1px solid rgba(74,163,255,.22);
+      color: rgba(234,241,255,.92);
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .badge .miniDot{width:7px;height:7px;border-radius:99px;background:var(--blue)}
+    .muted{color:var(--muted)}
+    .muted2{color:var(--muted2)}
+
+    /* Question */
+    .qWrap{
+      padding: var(--space-4);
+      display:flex;
+      flex-direction:column;
+      gap: var(--space-4);
+      min-height:0;
+    }
+    .qText{
+      font-size: 20px;
+      line-height:1.25;
+      margin:0;
+    }
+    .qMeta{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .hintBox{
+      background: rgba(255,255,255,.05);
+      border:1px dashed rgba(255,255,255,.14);
+      border-radius: 16px;
+      padding: 12px 14px;
+      color: var(--muted);
+      font-size: 13px;
+      display:none;
+    }
+    .hintBox.show{display:block}
+    .explainBox{
+      background: linear-gradient(180deg, rgba(59,226,143,.12), rgba(59,226,143,.06));
+      border:1px solid rgba(59,226,143,.18);
+      border-radius: 16px;
+      padding: 12px 14px;
+      color: rgba(234,241,255,.92);
+      font-size: 13px;
+      display:none;
+    }
+    .explainBox.bad{
+      background: linear-gradient(180deg, rgba(255,77,109,.14), rgba(255,77,109,.06));
+      border-color: rgba(255,77,109,.20);
+    }
+
+    .answers{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top:auto;
+    }
+    .ans{
+      text-align:left;
+      border-radius: 18px;
+      padding: 14px 14px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      cursor:pointer;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+      min-height: 58px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .ans:hover{background: rgba(255,255,255,.09)}
+    .ans:active{transform: translateY(1px)}
+    .ans:focus-visible{outline:none; box-shadow: var(--ring)}
+    .ans[aria-disabled="true"]{opacity:.42; cursor:not-allowed}
+    .ans .key{
+      width:28px;height:28px;border-radius:10px;
+      display:grid; place-items:center;
+      background: rgba(74,163,255,.14);
+      border:1px solid rgba(74,163,255,.22);
+      font-weight:800;
+      flex:0 0 auto;
+    }
+    .ans .txt{
+      font-size: 14px;
+      line-height:1.25;
+      color: rgba(234,241,255,.92);
+    }
+    .ans.selected{
+      border-color: rgba(74,163,255,.35);
+      background: linear-gradient(180deg, rgba(74,163,255,.18), rgba(255,255,255,.06));
+    }
+    .ans.locked{
+      border-color: rgba(255,209,102,.32);
+      background: linear-gradient(180deg, rgba(255,209,102,.16), rgba(255,255,255,.06));
+    }
+    .ans.correct{
+      border-color: rgba(59,226,143,.32);
+      background: linear-gradient(180deg, rgba(59,226,143,.18), rgba(255,255,255,.06));
+    }
+    .ans.wrong{
+      border-color: rgba(255,77,109,.32);
+      background: linear-gradient(180deg, rgba(255,77,109,.18), rgba(255,255,255,.06));
+    }
+
+    .qActions{
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+      margin-top: 4px;
+    }
+    .statusLine{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+      margin-top:-6px;
+      color: var(--muted);
+      font-size: 13px;
+      min-height: 18px;
+    }
+    .statusLine .ok{color: rgba(59,226,143,.95); font-weight:700}
+    .statusLine .no{color: rgba(255,77,109,.95); font-weight:700}
+    .statusLine .warn{color: rgba(255,209,102,.95); font-weight:700}
+
+    /* Right rail: ladder + lifelines */
+    .rail{
+      display:flex;
+      flex-direction:column;
+      gap: var(--space-4);
+      min-height:0;
+    }
+
+    .ladder{
+      padding: var(--space-3);
+      min-height:0;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .ladderList{
+      list-style:none; margin:0; padding:0;
+      display:flex;
+      flex-direction:column-reverse; /* show top prize at top visually? reverse then style */
+      gap:8px;
+      overflow:auto;
+      padding-right: 6px;
+      scrollbar-width: thin;
+    }
+    .step{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.09);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .step .n{
+      font-variant-numeric: tabular-nums;
+      color: rgba(234,241,255,.82);
+      font-weight:750;
+      min-width: 32px;
+    }
+    .step .p{
+      font-variant-numeric: tabular-nums;
+      color: rgba(234,241,255,.90);
+      font-weight:750;
+    }
+    .step.current{
+      color: rgba(234,241,255,.92);
+      background: linear-gradient(180deg, rgba(74,163,255,.18), rgba(255,255,255,.06));
+      border-color: rgba(74,163,255,.28);
+    }
+    .step.safe{
+      border-color: rgba(255,209,102,.18);
+      background: linear-gradient(180deg, rgba(255,209,102,.12), rgba(255,255,255,.05));
+    }
+    .step.done{
+      opacity:.62;
+    }
+
+    .life{
+      padding: var(--space-3);
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .lifeRow{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:10px;
+    }
+    .lifeBtn{
+      padding: 12px 10px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      cursor:pointer;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:center;
+      font-weight:800;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease, opacity .12s ease;
+      user-select:none;
+      text-align:center;
+      min-height: 54px;
+    }
+    .lifeBtn:hover{background: rgba(255,255,255,.09)}
+    .lifeBtn:active{transform: translateY(1px)}
+    .lifeBtn:focus-visible{outline:none; box-shadow: var(--ring)}
+    .lifeBtn.used{opacity:.46; cursor:not-allowed}
+    .lifeBtn svg{opacity:.95}
+    .lifeBtn .t{font-size:12px; line-height:1.1; color: rgba(234,241,255,.92)}
+    .lifeBtn .s{font-size:11px; color: var(--muted2); font-weight:650}
+
+    /* Overlays / modal */
+    .overlay{
+      position:fixed; inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:60;
+      padding: 18px;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(10px);
+    }
+    .overlay.show{display:flex}
+    .modal{
+      width:min(920px, 100%);
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modalHd{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,0));
+    }
+    .modalHd h2{margin:0; font-size:14px; letter-spacing:.2px}
+    .modalBd{
+      padding: 16px;
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 14px;
+    }
+    .modalBd.single{grid-template-columns: 1fr}
+    .modalFt{
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap;
+    }
+    .field{
+      display:flex; flex-direction:column; gap:7px;
+      padding: 12px 12px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    label{font-size:12px; color: var(--muted)}
+    input, select{
+      background: rgba(0,0,0,.22);
+      color: var(--fg);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 10px 11px;
+      font-size: 13px;
+      outline:none;
+    }
+    input:focus, select:focus{box-shadow: var(--ring); border-color: rgba(74,163,255,.25)}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+
+    .teacherPanel{
+      position:fixed; right: 14px; bottom: 14px;
+      width: min(420px, calc(100vw - 28px));
+      z-index: 50;
+      display:none;
+    }
+    .teacherPanel.show{display:block}
+    .teacherPanel .card{box-shadow: var(--shadow2)}
+    .teacherPanel .cardHd{padding: 12px 12px}
+    .teacherPanel .qWrap{padding: 12px 12px; gap: 10px}
+    .teacherPanel .miniGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    .toggle{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.10);
+      user-select:none;
+    }
+    .toggle span{font-size:12px; color: var(--muted)}
+    .switch{
+      width: 44px; height: 26px;
+      border-radius: 99px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.14);
+      position:relative;
+      flex:0 0 auto;
+      cursor:pointer;
+      transition: background .12s ease, border-color .12s ease;
+    }
+    .switch::after{
+      content:"";
+      position:absolute; top:50%; left: 3px;
+      width: 20px; height: 20px;
+      border-radius: 99px;
+      background: rgba(234,241,255,.92);
+      transform: translateY(-50%);
+      transition: left .14s ease;
+    }
+    .switch.on{
+      background: rgba(74,163,255,.22);
+      border-color: rgba(74,163,255,.26);
+    }
+    .switch.on::after{left: 21px}
+
+    /* Audience poll */
+    .poll{
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .barRow{
+      display:grid; grid-template-columns: 22px 1fr 46px;
+      gap:10px;
+      align-items:center;
+    }
+    .barKey{
+      width:22px;height:22px;border-radius:9px;
+      display:grid;place-items:center;
+      background: rgba(74,163,255,.14);
+      border: 1px solid rgba(74,163,255,.22);
+      font-weight:900;
+      font-size:12px;
+    }
+    .bar{
+      height: 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    .bar > i{
+      display:block; height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(74,163,255,.40), rgba(47,125,255,.18));
+      transition: width .55s ease;
+    }
+    .pct{
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+      font-size: 12px;
+      text-align:right;
+    }
+
+    /* Toast */
+    .toast{
+      position:fixed; left:50%; bottom: 18px;
+      transform: translateX(-50%);
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.58);
+      border: 1px solid rgba(255,255,255,.14);
+      color: rgba(234,241,255,.92);
+      font-size: 13px;
+      box-shadow: 0 12px 35px rgba(0,0,0,.45);
+      display:none;
+      z-index:70;
+      max-width: calc(100vw - 24px);
+    }
+    .toast.show{display:block}
+    .fade{transition: opacity .18s ease, transform .18s ease}
+    .slide{transition: transform .18s ease, opacity .18s ease}
+
+    /* Responsive: allow scroll on small screens */
+    @media (max-width: 980px){
+      body{overflow:auto}
+      main{
+        grid-template-columns: 1fr;
+      }
+      .teacherPanel{right: 10px; left: 10px; width:auto}
+    }
+
+    /* Helper */
+    .sr-only{
+      position:absolute;
+      width:1px;height:1px;
+      padding:0;margin:-1px;
+      overflow:hidden;clip:rect(0,0,0,0);
+      white-space:nowrap;border:0;
+    }
+  </style>
+</head>
+<body>
+  <div class="bgfx" aria-hidden="true"></div>
+
+  <div class="app" id="app">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true" id="logoBox"></div>
+        <div>
+          <h1 id="gameTitle">Who Wants to Be a Millionaire</h1>
+          <p id="gameTagline">Ứng dụng n8n cơ bản • Chế độ Học viên</p>
+        </div>
+      </div>
+
+      <div class="hud" aria-label="Bảng điều khiển">
+        <div class="pill" title="Thời gian còn lại cho câu hiện tại">
+          <span class="dot" aria-hidden="true"></span>
+          <span class="k">Timer</span>
+          <strong id="timerText">00:30</strong>
+        </div>
+        <div class="pill" title="Điểm hiện tại">
+          <span class="k">Score</span>
+          <strong id="scoreText">0</strong>
+        </div>
+        <div class="pill" title="Tiến độ câu hỏi">
+          <span class="k">Progress</span>
+          <strong id="progressText">0/12</strong>
+        </div>
+
+        <button class="btn ghost" id="btnTeacher" type="button" title="Mở Teacher Mode">
+          <span aria-hidden="true">🛠️</span>
+          Teacher
+        </button>
+        <button class="btn danger" id="btnReset" type="button" title="Reset ván chơi">
+          <span aria-hidden="true">↻</span>
+          Reset
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <!-- Left: Question -->
+      <section class="card" aria-label="Câu hỏi">
+        <div class="cardHd">
+          <div class="title">
+            <span class="badge" id="modeBadge"><span class="miniDot"></span><span>Student Mode</span></span>
+            <span class="muted2" id="roundText">Chưa bắt đầu</span>
+          </div>
+          <div class="row">
+            <span class="muted2" id="streakText" title="Chuỗi trả lời đúng liên tiếp">Streak: 0</span>
+            <button class="btn primary" id="btnStart" type="button">
+              <span aria-hidden="true">▶</span> Start
+            </button>
+          </div>
+        </div>
+
+        <div class="qWrap">
+          <div class="qMeta" aria-label="Thông tin câu hỏi">
+            <span class="badge" id="setBadge"><span class="miniDot"></span><span id="setName">Bộ đề: Cơ bản</span></span>
+            <span class="muted2" id="safeText" title="Mốc an toàn">Mốc an toàn: 5, 10</span>
+          </div>
+
+          <p class="qText" id="qText">Nhấn <strong>Start</strong> để bắt đầu trò chơi.</p>
+
+          <div class="statusLine" id="statusLine" aria-live="polite"></div>
+
+          <div class="hintBox" id="hintBox">
+            <strong>Hint:</strong> <span id="hintText"></span>
+          </div>
+
+          <div class="explainBox" id="explainBox">
+            <strong>Giải thích:</strong> <span id="explainText"></span>
+          </div>
+
+          <div class="answers" role="group" aria-label="Các lựa chọn">
+            <button class="ans" type="button" data-idx="0">
+              <span class="key" aria-hidden="true">A</span>
+              <span class="txt" id="a0">—</span>
+            </button>
+            <button class="ans" type="button" data-idx="1">
+              <span class="key" aria-hidden="true">B</span>
+              <span class="txt" id="a1">—</span>
+            </button>
+            <button class="ans" type="button" data-idx="2">
+              <span class="key" aria-hidden="true">C</span>
+              <span class="txt" id="a2">—</span>
+            </button>
+            <button class="ans" type="button" data-idx="3">
+              <span class="key" aria-hidden="true">D</span>
+              <span class="txt" id="a3">—</span>
+            </button>
+          </div>
+
+          <div class="qActions" aria-label="Hành động câu hỏi">
+            <button class="btn" id="btnHint" type="button" title="Xem gợi ý (nếu có)">
+              <span aria-hidden="true">💡</span> Hint
+            </button>
+            <button class="btn" id="btnLock" type="button" title="Chốt đáp án">
+              <span aria-hidden="true">🔒</span> Final Answer
+            </button>
+            <button class="btn" id="btnRevealStudent" type="button" title="Hiện đáp án đúng (Student Mode)">
+              <span aria-hidden="true">👁️</span> Reveal
+            </button>
+            <button class="btn primary" id="btnNextStudent" type="button" title="Sang câu tiếp theo (Student Mode)">
+              <span aria-hidden="true">⏭</span> Next
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Ladder + Lifelines -->
+      <aside class="rail" aria-label="Bảng thưởng và quyền trợ giúp">
+        <section class="card" aria-label="Bảng thưởng">
+          <div class="cardHd">
+            <div class="title">
+              <span class="badge"><span class="miniDot"></span><span>Prize Ladder</span></span>
+              <span class="muted2" id="prizeNow">—</span>
+            </div>
+            <button class="btn" id="btnExport" type="button" title="Xuất ảnh kết quả">
+              <span aria-hidden="true">🖼️</span> Export
+            </button>
+          </div>
+          <div class="ladder">
+            <ul class="ladderList" id="ladderList" aria-label="Danh sách mức thưởng"></ul>
+          </div>
+        </section>
+
+        <section class="card" aria-label="Trợ giúp">
+          <div class="cardHd">
+            <div class="title">
+              <span class="badge"><span class="miniDot"></span><span>Lifelines</span></span>
+              <span class="muted2">Mỗi quyền dùng 1 lần</span>
+            </div>
+          </div>
+
+          <div class="life">
+            <div class="lifeRow">
+              <button class="lifeBtn" id="life5050" type="button" title="Loại bỏ 2 đáp án sai">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M5 7h14M5 12h8M5 17h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <div>
+                  <div class="t">50:50</div>
+                  <div class="s">Loại 2 sai</div>
+                </div>
+              </button>
+              <button class="lifeBtn" id="lifeAsk" type="button" title="Hỏi lớp (khảo sát nhanh)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M4 20V9M10 20V4M16 20v-7M22 20V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <div>
+                  <div class="t">Hỏi lớp</div>
+                  <div class="s">Poll nhanh</div>
+                </div>
+              </button>
+              <button class="lifeBtn" id="lifeSwap" type="button" title="Đổi câu hỏi khác cùng độ khó">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M7 7h10l-2-2M17 17H7l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div>
+                  <div class="t">Đổi câu</div>
+                  <div class="s">Switch</div>
+                </div>
+              </button>
+            </div>
+
+            <div class="muted" style="font-size:12px; line-height:1.35">
+              Gợi ý tổ chức: chiếu lên màn hình, cả lớp chọn đáp án → bấm <strong>Final Answer</strong> → (Teacher Mode: giáo viên bấm <strong>Reveal</strong>).
+            </div>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <!-- Teacher Panel (floating) -->
+    <div class="teacherPanel" id="teacherPanel" aria-label="Teacher Mode panel">
+      <section class="card">
+        <div class="cardHd">
+          <div class="title">
+            <span class="badge"><span class="miniDot"></span><span>Teacher Mode</span></span>
+            <span class="muted2" id="teacherState">Ready</span>
+          </div>
+          <button class="btn ghost" id="btnTeacherClose" type="button" title="Đóng Teacher Mode">
+            <span aria-hidden="true">✕</span> Close
+          </button>
+        </div>
+        <div class="qWrap">
+          <div class="miniGrid">
+            <div class="field">
+              <label for="selSet">Bộ câu hỏi</label>
+              <select id="selSet" aria-label="Chọn bộ câu hỏi"></select>
+            </div>
+            <div class="field">
+              <label for="inpTime">Timer mỗi câu (giây)</label>
+              <input id="inpTime" type="number" min="10" max="300" step="5" />
+            </div>
+          </div>
+
+          <div class="toggle" title="Bật để giáo viên chủ động bấm Reveal; tắt thì tự Reveal sau khi chốt đáp án">
+            <span>Manual Reveal</span>
+            <div class="switch on" id="swManual" role="switch" aria-checked="true" tabindex="0"></div>
+          </div>
+
+          <div class="row" style="justify-content:flex-end">
+            <button class="btn primary" id="tBtnStart" type="button"><span aria-hidden="true">▶</span> Start/Resume</button>
+            <button class="btn" id="tBtnPause" type="button"><span aria-hidden="true">⏸</span> Pause</button>
+            <button class="btn" id="tBtnReveal" type="button"><span aria-hidden="true">👁️</span> Reveal</button>
+            <button class="btn" id="tBtnNext" type="button"><span aria-hidden="true">⏭</span> Next</button>
+            <button class="btn danger" id="tBtnReset" type="button"><span aria-hidden="true">↻</span> Reset</button>
+          </div>
+
+          <div class="muted2" style="font-size:12px; line-height:1.35">
+            Mật khẩu: <strong>n8n</strong>. Gợi ý: để <strong>Manual Reveal</strong> bật khi chơi theo lớp (giáo viên kiểm soát nhịp).
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Overlay: Teacher login -->
+    <div class="overlay" id="ovTeacher" role="dialog" aria-modal="true" aria-labelledby="teacherTitle">
+      <div class="modal">
+        <div class="modalHd">
+          <h2 id="teacherTitle">Teacher Mode</h2>
+          <button class="btn ghost" id="btnTeacherCancel" type="button"><span aria-hidden="true">✕</span> Đóng</button>
+        </div>
+        <div class="modalBd">
+          <div class="field">
+            <label for="inpPass">Nhập mật khẩu</label>
+            <input id="inpPass" type="password" placeholder="Password" autocomplete="off" />
+            <div class="muted2" style="font-size:12px; line-height:1.35">
+              Dùng để bật bảng điều khiển giáo viên (Start/Next/Reveal, chọn bộ đề, chỉnh timer).
+            </div>
+          </div>
+          <div class="field">
+            <label>Trạng thái</label>
+            <div class="muted" id="passStatus">Chưa xác thực</div>
+            <div class="muted2" style="font-size:12px; line-height:1.35">
+              Tip: bật Teacher Mode khi cần “nhịp lớp học” và giảm tranh luận kéo dài.
+            </div>
+          </div>
+        </div>
+        <div class="modalFt">
+          <button class="btn primary" id="btnTeacherOk" type="button"><span aria-hidden="true">🔓</span> Mở</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay: Audience poll -->
+    <div class="overlay" id="ovPoll" role="dialog" aria-modal="true" aria-labelledby="pollTitle">
+      <div class="modal">
+        <div class="modalHd">
+          <h2 id="pollTitle">Hỏi lớp – Kết quả bình chọn</h2>
+          <button class="btn ghost" id="btnPollClose" type="button"><span aria-hidden="true">✕</span> Đóng</button>
+        </div>
+        <div class="modalBd single">
+          <div class="field">
+            <div class="poll" id="pollBody" aria-label="Biểu đồ bình chọn"></div>
+            <div class="muted2" style="font-size:12px; line-height:1.35">
+              Lưu ý: đây là mô phỏng (bias theo độ khó). Hãy dùng như “điểm tham khảo” để kích hoạt thảo luận nhanh.
+            </div>
+          </div>
+        </div>
+        <div class="modalFt">
+          <button class="btn primary" id="btnPollOk" type="button"><span aria-hidden="true">✅</span> OK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay: Final answer confirm -->
+    <div class="overlay" id="ovFinal" role="dialog" aria-modal="true" aria-labelledby="finalTitle">
+      <div class="modal">
+        <div class="modalHd">
+          <h2 id="finalTitle">Chốt đáp án?</h2>
+          <button class="btn ghost" id="btnFinalClose" type="button"><span aria-hidden="true">✕</span> Đóng</button>
+        </div>
+        <div class="modalBd single">
+          <div class="field">
+            <div class="muted2" style="font-size:12px">Bạn chọn</div>
+            <div style="font-weight:850; font-size:16px; line-height:1.25" id="finalChoiceText">—</div>
+            <div class="muted" style="font-size:12px; line-height:1.35; margin-top:8px">
+              Khi chốt, bạn không thể đổi đáp án. (Teacher Mode có thể bật Manual Reveal)
+            </div>
+          </div>
+        </div>
+        <div class="modalFt">
+          <button class="btn" id="btnFinalNo" type="button"><span aria-hidden="true">↩</span> Chưa</button>
+          <button class="btn primary" id="btnFinalYes" type="button"><span aria-hidden="true">🔒</span> Final Answer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay: Result -->
+    <div class="overlay" id="ovResult" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+      <div class="modal">
+        <div class="modalHd">
+          <h2 id="resultTitle">Kết quả trò chơi</h2>
+          <button class="btn ghost" id="btnResultClose" type="button"><span aria-hidden="true">✕</span> Đóng</button>
+        </div>
+        <div class="modalBd">
+          <div class="field">
+            <div class="muted2" style="font-size:12px">Tổng quan</div>
+            <div style="display:grid; gap:8px; margin-top:8px">
+              <div class="row" style="justify-content:space-between">
+                <span class="muted">Score</span><strong id="rScore">0</strong>
+              </div>
+              <div class="row" style="justify-content:space-between">
+                <span class="muted">Đúng</span><strong id="rCorrect">0</strong>
+              </div>
+              <div class="row" style="justify-content:space-between">
+                <span class="muted">Sai</span><strong id="rWrong">0</strong>
+              </div>
+              <div class="row" style="justify-content:space-between">
+                <span class="muted">Thời gian</span><strong id="rTime">00:00</strong>
+              </div>
+              <div class="row" style="justify-content:space-between">
+                <span class="muted">Bộ đề</span><strong id="rSet">—</strong>
+              </div>
+            </div>
+            <div class="muted2" style="font-size:12px; line-height:1.35; margin-top:10px">
+              Tip: chụp/Export để lưu kết quả lớp, dùng làm “mini KPI” cho buổi học.
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="muted2" style="font-size:12px">Xuất ảnh ngay trong trình duyệt</div>
+            <canvas id="resultCanvas" width="1200" height="675" style="width:100%; border-radius:16px; border:1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.20)"></canvas>
+            <div class="row" style="justify-content:flex-end; margin-top:10px">
+              <button class="btn" id="btnRender" type="button"><span aria-hidden="true">🧾</span> Render</button>
+              <a class="btn primary" id="btnDownload" href="#" download="millionaire_result.png" role="button"><span aria-hidden="true">⬇</span> Download PNG</a>
+            </div>
+          </div>
+        </div>
+        <div class="modalFt">
+          <button class="btn danger" id="btnPlayAgain" type="button"><span aria-hidden="true">↻</span> Chơi lại</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast fade" id="toast" role="status" aria-live="polite"></div>
+
+    <!-- Quick Guide (end of file requirement) -->
+    <section class="card" style="margin: 0 var(--space-4) var(--space-4); display:none" aria-hidden="true"></section>
+    <details style="position:fixed; left:14px; bottom:14px; width:min(520px, calc(100vw - 28px)); z-index:40">
+      <summary class="btn" style="list-style:none">
+        <span aria-hidden="true">📌</span> Hướng dẫn nhanh (ở cuối file)
+      </summary>
+      <div class="card" style="margin-top:10px">
+        <div class="cardHd">
+          <div class="title">
+            <span class="badge"><span class="miniDot"></span><span>Quick Guide</span></span>
+            <span class="muted2">Cách đổi dữ liệu & cách chơi</span>
+          </div>
+        </div>
+        <div class="qWrap" style="padding: 14px 14px 16px; gap: 10px">
+          <div class="muted" style="font-size:13px; line-height:1.45">
+            <strong>1) Đổi dữ liệu câu hỏi:</strong> mở file, tìm biến <code>CONFIG</code> → <code>questionSets</code> → sửa <code>questions</code> / <code>backup</code> (mỗi câu có <code>q/options/answerIndex/hint/explanation</code>).<br/>
+            <strong>2) Chơi trên lớp:</strong> chiếu màn hình → bấm <strong>Start</strong> → cả lớp chọn đáp án → bấm <strong>Final Answer</strong> → (Teacher Mode) bấm <strong>Reveal</strong> để chốt → <strong>Next</strong> sang câu tiếp.<br/>
+            <strong>3) Lifelines:</strong> <em>50:50</em> loại 2 sai; <em>Hỏi lớp</em> hiện poll nhanh; <em>Đổi câu</em> thay bằng câu dự phòng cùng độ khó.<br/>
+            <strong>4) Teacher Mode:</strong> bấm <strong>Teacher</strong> (mật khẩu: <strong>n8n</strong>) → chọn bộ đề + chỉnh timer + điều khiển Start/Pause/Reveal/Next.<br/>
+            <strong>5) Xuất ảnh kết quả:</strong> bấm <strong>Export</strong> → <strong>Render</strong> → <strong>Download PNG</strong>.
+          </div>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <script>
+    'use strict';
+
+    // =========================
+    // CONFIG (Teacher edit here)
+    // =========================
+    const CONFIG = {
+      links: { facebook: "", linkedin: "", youtube: "" },
+      assets: {
+        logoSvg: `
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2l8.5 5v10L12 22 3.5 17V7L12 2Z" stroke="rgba(234,241,255,.95)" stroke-width="2" />
+            <path d="M8 12h8" stroke="rgba(74,163,255,.95)" stroke-width="2" stroke-linecap="round"/>
+            <path d="M12 8v8" stroke="rgba(59,226,143,.95)" stroke-width="2" stroke-linecap="round"/>
+          </svg>`
+      },
+      text: {
+        brand: "KPIM / COMPA Class",
+        gameTitle: "Who Wants to Be a Millionaire",
+        tagline: "Ứng dụng n8n cơ bản",
+        teacherPass: "n8n"
+      },
+      settings: {
+        totalQuestions: 12,            // 10–15
+        timePerQuestionSec: 30,
+        safeLevels: [5, 10],           // milestone like Millionaire
+        pointsLadder: [100,200,300,500,800,1200,1800,2500,3500,5000,7000,10000],
+        streakBonusEvery: 3,           // bonus each N streak
+        streakBonusPoints: 250
+      },
+      questionSets: [
+        {
+          id: "basic",
+          name: "Cơ bản (n8n Fundamentals)",
+          questions: [
+            { q:"n8n chủ yếu dùng để làm gì?", options:["Thiết kế UI web","Tự động hoá workflow","Lưu trữ file như Google Drive","Quản lý mật khẩu"], answerIndex:1, hint:"Nghĩ về việc nối các bước lại thành chuỗi.", explanation:"n8n là công cụ automation/workflow để kết nối các dịch vụ và tự động hoá quy trình." },
+            { q:"Trong n8n, “Node” thường đại diện cho gì?", options:["Một bước xử lý/kết nối","Một người dùng trong hệ thống","Một file cấu hình","Một server vật lý"], answerIndex:0, hint:"Workflow được ghép từ nhiều khối.", explanation:"Node là đơn vị chức năng – 1 bước trong workflow (trigger, action, transform...)." },
+            { q:"Trigger node dùng để làm gì?", options:["Kết thúc workflow","Bắt đầu workflow khi có sự kiện","Chỉ để hiển thị log","Tăng tốc độ chạy"], answerIndex:1, hint:"Nếu không có trigger, workflow “chờ” điều gì?", explanation:"Trigger là điểm khởi động workflow (Webhook, Schedule, IMAP, …)." },
+            { q:"Webhook trong n8n thường hữu ích nhất khi nào?", options:["Muốn chạy theo giờ cố định","Muốn nhận dữ liệu từ hệ thống khác gọi vào","Muốn lưu dữ liệu vào Excel offline","Muốn tạo biểu đồ"], answerIndex:1, hint:"Hệ thống khác “bắn” request tới bạn.", explanation:"Webhook nhận HTTP request để kích hoạt workflow và nhận payload." },
+            { q:"Khi cần “lặp” qua danh sách items trong n8n, bạn thường dùng gì?", options:["Split in Batches","Stop and Error","NoOp","Merge (Pass-through)"], answerIndex:0, hint:"Tên node gợi ý chia nhỏ theo từng batch.", explanation:"Split in Batches giúp xử lý tuần tự/nhóm các items." },
+            { q:"Node nào thường dùng để biến đổi dữ liệu dạng JSON nhanh trong n8n?", options:["Code","Set","HTTP Request","Webhook"], answerIndex:1, hint:"Không cần code vẫn map được fields.", explanation:"Set node giúp tạo/đổi fields, map dữ liệu, gán giá trị nhanh." },
+            { q:"Trong n8n, “Expression” dùng để làm gì?", options:["Vẽ biểu đồ","Tính toán/ghép chuỗi động từ dữ liệu","Tải file lên cloud","Chạy cron system"], answerIndex:1, hint:"Giống công thức để tạo giá trị động.", explanation:"Expression cho phép tham chiếu dữ liệu node trước và xử lý động." },
+            { q:"Một best practice khi gọi API bằng HTTP Request node là gì?", options:["Hardcode token vào text","Không cần xử lý lỗi","Dùng credential/biến môi trường cho secrets","Gửi dữ liệu tùy ý không validate"], answerIndex:2, hint:"Bảo mật luôn là ưu tiên.", explanation:"Nên dùng Credentials/Env vars để quản lý secrets, tránh hardcode." },
+            { q:"Nếu một node phía sau không chạy, nguyên nhân phổ biến là gì?", options:["Node trước không output items","Thiếu icon","Màu theme bị lỗi","n8n không hỗ trợ JSON"], answerIndex:0, hint:"Dòng chảy dữ liệu bị “đứt”.", explanation:"Nhiều node yêu cầu input items; node trước không trả dữ liệu thì node sau không chạy." },
+            { q:"Bạn muốn chạy workflow mỗi 5 phút. Trigger phù hợp nhất?", options:["Schedule Trigger","Webhook Trigger","Manual Trigger (chạy tay)","NoOp"], answerIndex:0, hint:"Chạy theo thời gian định kỳ.", explanation:"Schedule Trigger hỗ trợ cron/interval (ví dụ mỗi 5 phút)." },
+            { q:"Khi workflow gặp lỗi, cách “an toàn” để vẫn tiếp tục xử lý các item còn lại là gì (tư duy cơ bản)?", options:["Bỏ qua logging","Dùng Error Trigger/try-catch logic và xử lý lỗi từng item","Tắt workflow","Xóa node bị lỗi"], answerIndex:1, hint:"Xử lý lỗi như 1 nhánh riêng.", explanation:"Thiết kế nhánh xử lý lỗi giúp hệ thống bền: log, retry, hoặc skip theo điều kiện." },
+            { q:"Tại sao nên đặt tên node rõ ràng (best practice) trong workflow dài?", options:["Để workflow chạy nhanh hơn","Để debug, bảo trì và handover dễ","Để tăng số node tối đa","Vì n8n bắt buộc"], answerIndex:1, hint:"Tối ưu cho người đọc, không phải cho máy.", explanation:"Tên node rõ ràng giúp debug, theo dõi data lineage và bàn giao nhanh." }
+          ],
+          backup: [
+            { q:"Node “Merge” thường dùng khi nào (cơ bản)?", options:["Tạo webhook","Kết hợp dữ liệu từ 2 nhánh","Gửi email","Tăng tốc CPU"], answerIndex:1, hint:"Gom 2 luồng vào 1.", explanation:"Merge giúp kết hợp dữ liệu từ nhiều nhánh theo chế độ merge." },
+            { q:"Manual Trigger phù hợp nhất với tình huống nào?", options:["Test/POC chạy tay","Nhận request từ hệ thống khác","Chạy theo lịch","Chạy khi có email mới"], answerIndex:0, hint:"Dùng khi bạn muốn chủ động bấm chạy.", explanation:"Manual Trigger giúp chạy thử nhanh trong quá trình build/debug." }
+          ]
+        },
+        {
+          id: "practice",
+          name: "Thực hành (Workflow thực tế)",
+          questions: [
+            { q:"Muốn nhận dữ liệu form website và đẩy vào Google Sheets, bạn sẽ cần ít nhất những nhóm node nào?", options:["Trigger + Transform + Destination","Chỉ cần 1 node bất kỳ","Chỉ cần Merge","Chỉ cần NoOp"], answerIndex:0, hint:"Bắt đầu → xử lý → ghi dữ liệu.", explanation:"Tối thiểu: Trigger (Webhook/Form), Transform (Set/Code), Destination (Sheets)." },
+            { q:"Trong HTTP Request node, “Method” GET vs POST khác nhau cơ bản ở đâu?", options:["GET gửi body lớn hơn POST","POST thường gửi dữ liệu trong body; GET thường lấy dữ liệu bằng query","GET bảo mật hơn POST mặc định","POST luôn nhanh hơn"], answerIndex:1, hint:"Cách truyền dữ liệu là điểm khác chính.", explanation:"GET chủ yếu lấy dữ liệu; POST thường tạo/ghi và gửi payload trong body." },
+            { q:"Khi map dữ liệu từ node trước sang node sau, bạn nên ưu tiên gì để giảm lỗi?", options:["Copy/paste tùy ý","Dùng Expression tham chiếu đúng field + kiểm tra null","Luôn hardcode giá trị","Tắt validation"], answerIndex:1, hint:"Nghĩ về dữ liệu thiếu/khác schema.", explanation:"Tham chiếu đúng field và xử lý null giúp workflow bền hơn." },
+            { q:"Nếu một API giới hạn 60 requests/phút, cách xử lý “đúng bài” trong n8n là gì?", options:["Gọi dồn 200 requests cùng lúc","Thêm delay/rate limit theo batch","Tắt log để nhanh","Chạy lại nhiều lần"], answerIndex:1, hint:"Kiểm soát tốc độ gọi.", explanation:"Dùng batch + delay/rate limit để tuân thủ rate limit, tránh bị block." },
+            { q:"Bạn muốn lưu log mỗi lần workflow chạy (payload + status). Best practice đơn giản?", options:["Không lưu gì","Ghi vào DB/Sheet/Storage riêng theo timestamp","Chỉ chụp màn hình","Đổi màu node"], answerIndex:1, hint:"Log giúp audit & debug.", explanation:"Ghi log ra nơi lưu trữ giúp truy vết vấn đề, đo tần suất lỗi." },
+            { q:"Trong xử lý danh sách items, vì sao “Split in Batches” hữu ích hơn chạy một lần tất cả?", options:["Vì nó tạo UI đẹp hơn","Giúp kiểm soát memory, retry, rate limit","Vì n8n bắt buộc","Vì nó tự tạo biểu đồ"], answerIndex:1, hint:"Quy mô lớn sẽ gặp bottleneck.", explanation:"Batch giúp ổn định khi dữ liệu lớn: tránh quá tải và dễ kiểm soát." },
+            { q:"Trường hợp nào nên dùng “Code” node thay vì “Set” node?", options:["Khi chỉ rename 1 field","Khi cần logic phức tạp, loop, điều kiện nhiều","Khi muốn đổi theme","Khi muốn chạy cron"], answerIndex:1, hint:"Set mạnh nhưng có giới hạn.", explanation:"Code node phù hợp khi cần xử lý phức tạp vượt khả năng mapping đơn giản." },
+            { q:"Một cách đơn giản để tăng độ tin cậy workflow khi gọi API dễ lỗi là gì?", options:["Không dùng API","Bật retry/backoff và bắt lỗi","Tắt internet","Chạy tay"], answerIndex:1, hint:"Thất bại là chuyện bình thường.", explanation:"Retry/backoff + bắt lỗi giúp workflow chống chập chờn mạng/dịch vụ." },
+            { q:"Bạn muốn gửi email khi điều kiện đúng (ví dụ status=FAILED). Cách tiếp cận cơ bản?", options:["Luôn gửi mọi lúc","Dùng IF node tạo nhánh, rồi Email node ở nhánh đúng","Chỉ dùng Merge","Chỉ dùng Webhook"], answerIndex:1, hint:"Điều kiện → rẽ nhánh.", explanation:"IF node giúp tách luồng theo điều kiện, chỉ gửi khi thỏa." },
+            { q:"Tại sao nên tách workflow thành các “module” (sub-workflow) khi phức tạp?", options:["Để tăng số node","Để tái sử dụng và bảo trì dễ","Để tăng chi phí","Vì UI đẹp"], answerIndex:1, hint:"Giống code: tách hàm.", explanation:"Modular hóa giúp reuse, test từng phần và giảm rủi ro khi thay đổi." },
+            { q:"Khi tích hợp nhiều hệ thống, điều quan trọng nhất để giảm lỗi mapping là gì?", options:["Đổi tên node ngẫu nhiên","Chuẩn hóa schema dữ liệu trung gian","Không cần schema","Tắt debug"], answerIndex:1, hint:"Có “ngôn ngữ chung” giữa các hệ.", explanation:"Schema trung gian giúp data contract rõ ràng, giảm sai lệch." },
+            { q:"Bạn muốn vừa ghi dữ liệu vào Sheet vừa gửi thông báo Slack. Cách workflow hợp lý?", options:["Chỉ chọn 1 việc","Tạo 2 nhánh song song hoặc tuần tự tùy yêu cầu, đảm bảo log lỗi","Xóa Merge","Đổi màu background"], answerIndex:1, hint:"Một input, nhiều output.", explanation:"Có thể tuần tự hoặc tách nhánh; quan trọng là xử lý lỗi và log." }
+          ],
+          backup: [
+            { q:"Khi chạy theo lịch, bạn nên cân nhắc gì đầu tiên?", options:["Màu nền","Khung giờ ít tải và SLA","Số icon","Tên game"], answerIndex:1, hint:"Chạy giờ cao điểm dễ quá tải.", explanation:"Chọn lịch phù hợp giúp hệ thống ổn định, tránh trùng giờ job khác." },
+            { q:"Nếu dữ liệu đầu vào có thể thiếu field, cách thiết kế an toàn?", options:["Assume luôn đủ","Validate + default value + nhánh xử lý lỗi","Xóa node","Tắt workflow"], answerIndex:1, hint:"Phòng thủ thay vì cầu may.", explanation:"Validate & default giúp tránh crash; nhánh lỗi giúp audit." }
+          ]
+        },
+        {
+          id: "hard",
+          name: "Nâng cao (Tư duy triển khai & vận hành)",
+          questions: [
+            { q:"Trong automation, rủi ro lớn nhất khi “hardcode token” trong workflow là gì?", options:["Workflow chạy chậm","Rò rỉ secrets, mất kiểm soát quyền truy cập","UI xấu","Không thể dùng Expression"], answerIndex:1, hint:"Security incident thường đến từ secrets.", explanation:"Hardcode token dễ bị lộ qua export/log/chia sẻ file." },
+            { q:"Một nguyên tắc tốt để thiết kế workflow bền vững là gì?", options:["Không log để nhẹ","Idempotency / tránh chạy trùng tạo dữ liệu lặp","Tăng số node","Chạy mọi thứ realtime"], answerIndex:1, hint:"Chạy lại không được tạo “nhân bản”.", explanation:"Idempotent giúp rerun an toàn, giảm duplicate khi retry." },
+            { q:"Bạn cần xử lý 10.000 bản ghi/ngày. Ưu tiên tối ưu nào trước?", options:["Thêm icon","Batch + giới hạn concurrency + log + retry","Đổi theme màu","Tắt validation"], answerIndex:1, hint:"Khả năng chịu tải đến từ “nhịp xử lý”.", explanation:"Batch & concurrency hợp lý giúp ổn định, tránh timeout và rate limit." },
+            { q:"Khi tích hợp nhiều kênh (Email/Chat/CRM), thứ cần chuẩn hóa sớm nhất là gì?", options:["Màu header","ID/Key định danh và schema dữ liệu trung tâm","Tên lớp học","Font chữ"], answerIndex:1, hint:"Nếu không có ID chung, sẽ không nối được data.", explanation:"Định danh & schema trung tâm là nền tảng cho đồng bộ đa kênh." },
+            { q:"Một cách đo hiệu quả automation đơn giản cho đội vận hành?", options:["Đếm số icon","Theo dõi: số job chạy, % lỗi, thời gian xử lý, số giờ tiết kiệm","Chỉ nhìn UI","Tắt logs"], answerIndex:1, hint:"KPI phải đo được.", explanation:"Các chỉ số vận hành giúp ra quyết định tối ưu & mở rộng." },
+            { q:"Nếu workflow phụ thuộc API bên thứ 3 không ổn định, thiết kế nào hợp lý nhất?", options:["Gọi liên tục đến khi được","Circuit breaker / retry có giới hạn / fallback queue","Tắt workflow","Đổi provider ngay"], answerIndex:1, hint:"Đừng để 1 service kéo sập toàn hệ.", explanation:"Chiến lược resilience giúp giảm sập dây chuyền và kiểm soát lỗi." },
+            { q:"Bạn muốn “audit” ai đã thay đổi workflow. Nên ưu tiên gì?", options:["Không cần audit","Versioning + quyền truy cập + log thay đổi","Tăng số node","Chụp màn hình"], answerIndex:1, hint:"Vận hành cần truy vết.", explanation:"Versioning & access control giúp truy vết và rollback khi cần." },
+            { q:"Vì sao nên tách môi trường DEV/PROD khi triển khai automation?", options:["Để UI đẹp","Giảm rủi ro thay đổi gây downtime, test an toàn trước khi lên PROD","Để có nhiều workflow","Vì bắt buộc"], answerIndex:1, hint:"Test trên PROD là tự sát.", explanation:"Tách môi trường giúp kiểm soát thay đổi, giảm rủi ro vận hành." },
+            { q:"Một chiến lược lưu trữ log tốt thường cần thuộc tính nào tối thiểu?", options:["Màu sắc","Timestamp + workflow + status + correlationId","Font chữ","Icon"], answerIndex:1, hint:"Log phải truy vết theo “vụ việc”.", explanation:"Timestamp, status, correlationId giúp điều tra incident nhanh." },
+            { q:"Nếu cần xử lý dữ liệu nhạy cảm, điều nào nên làm ngay?", options:["Bỏ qua permission","Mask/limit dữ liệu + quản trị quyền + secrets management","Tăng timer","Đổi tên node"], answerIndex:1, hint:"Privacy by design.", explanation:"Giảm dữ liệu nhạy cảm và quản trị quyền/secret là bắt buộc." },
+            { q:"Trong bối cảnh automation, “realtime” khác “async” ở đâu (tư duy n8n cơ bản)?", options:["Realtime luôn rẻ hơn","Realtime phản hồi ngay; async xử lý nền và trả kết quả sau","Async luôn sai","Không khác"], answerIndex:1, hint:"Liên quan trải nghiệm và độ trễ.", explanation:"Realtime cần phản hồi nhanh; async xử lý nền, phù hợp tác vụ nặng." },
+            { q:"Nếu lớp học muốn demo nhanh giá trị n8n, kịch bản nào “ăn điểm” nhất?", options:["Tạo theme mới","Webhook nhận form → enrich dữ liệu → gửi thông báo + lưu log","Chỉ mở UI","Tăng số node vô nghĩa"], answerIndex:1, hint:"Nhìn thấy end-to-end.", explanation:"Demo end-to-end cho thấy n8n kết nối hệ và tạo giá trị tức thì." }
+          ],
+          backup: [
+            { q:"Khi export/import workflow giữa các máy, rủi ro thường gặp nhất?", options:["Màu nền đổi","Secrets/credentials không đi kèm hoặc sai môi trường","Icon mất","Font bị lỗi"], answerIndex:1, hint:"Credentials thường phụ thuộc môi trường.", explanation:"Credentials cần cấu hình lại đúng môi trường; tránh hardcode." },
+            { q:"Nếu bị duplicate dữ liệu do rerun, cách khắc phục gốc là gì?", options:["Xóa tay","Thiết kế idempotent (key duy nhất + upsert)","Tắt workflow","Tăng timer"], answerIndex:1, hint:"Đừng chỉ chữa triệu chứng.", explanation:"Upsert theo key và idempotency giúp rerun không tạo trùng." }
+          ]
+        }
+      ]
+    };
+
+    // =========================
+    // DOM helpers
+    // =========================
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+    const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+    const fmtTime = (sec) => {
+      sec = Math.max(0, Math.floor(sec));
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    };
+    const now = () => performance.now();
+
+    function rand01(){
+      // crypto-backed if available
+      if (window.crypto && crypto.getRandomValues){
+        const a = new Uint32Array(1);
+        crypto.getRandomValues(a);
+        return a[0] / 4294967295;
+      }
+      return Math.random();
+    }
+    function shuffle(arr){
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--){
+        const j = Math.floor(rand01() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    // =========================
+    // State
+    // =========================
+    const state = {
+      mode: 'student',               // student | teacher
+      teacherAuthed: false,
+      manualReveal: true,
+
+      setId: CONFIG.questionSets[0].id,
+      questions: [],
+      backup: [],
+      total: CONFIG.settings.totalQuestions,
+
+      idx: -1,
+      selected: null,
+      locked: false,
+      revealed: false,
+
+      lifelines: { fifty:false, ask:false, swap:false },
+      fiftyEliminated: new Set(),
+
+      score: 0,
+      streak: 0,
+
+      running: false,
+      paused: false,
+      timePerQ: CONFIG.settings.timePerQuestionSec,
+      remain: CONFIG.settings.timePerQuestionSec,
+      timerId: null,
+
+      startedAt: 0,
+      totalElapsedSec: 0,
+      qStartedAt: 0,
+
+      history: [] // {q, correctIndex, chosenIndex, isCorrect, timeSpentSec, used:{...}}
+    };
+
+    // =========================
+    // Elements
+    // =========================
+    const el = {
+      gameTitle: $('#gameTitle'),
+      gameTagline: $('#gameTagline'),
+      logoBox: $('#logoBox'),
+
+      modeBadge: $('#modeBadge'),
+      roundText: $('#roundText'),
+
+      timerText: $('#timerText'),
+      scoreText: $('#scoreText'),
+      progressText: $('#progressText'),
+      streakText: $('#streakText'),
+
+      setName: $('#setName'),
+      qText: $('#qText'),
+      statusLine: $('#statusLine'),
+      hintBox: $('#hintBox'),
+      hintText: $('#hintText'),
+      explainBox: $('#explainBox'),
+      explainText: $('#explainText'),
+
+      answers: $$('.ans'),
+      aTxt: [$('#a0'),$('#a1'),$('#a2'),$('#a3')],
+
+      btnStart: $('#btnStart'),
+      btnHint: $('#btnHint'),
+      btnLock: $('#btnLock'),
+      btnRevealStudent: $('#btnRevealStudent'),
+      btnNextStudent: $('#btnNextStudent'),
+
+      btnReset: $('#btnReset'),
+      btnTeacher: $('#btnTeacher'),
+      btnExport: $('#btnExport'),
+
+      ladderList: $('#ladderList'),
+      prizeNow: $('#prizeNow'),
+
+      life5050: $('#life5050'),
+      lifeAsk: $('#lifeAsk'),
+      lifeSwap: $('#lifeSwap'),
+
+      // teacher
+      teacherPanel: $('#teacherPanel'),
+      teacherState: $('#teacherState'),
+      btnTeacherClose: $('#btnTeacherClose'),
+      selSet: $('#selSet'),
+      inpTime: $('#inpTime'),
+      swManual: $('#swManual'),
+      tBtnStart: $('#tBtnStart'),
+      tBtnPause: $('#tBtnPause'),
+      tBtnReveal: $('#tBtnReveal'),
+      tBtnNext: $('#tBtnNext'),
+      tBtnReset: $('#tBtnReset'),
+
+      // overlays
+      ovTeacher: $('#ovTeacher'),
+      btnTeacherCancel: $('#btnTeacherCancel'),
+      btnTeacherOk: $('#btnTeacherOk'),
+      inpPass: $('#inpPass'),
+      passStatus: $('#passStatus'),
+
+      ovPoll: $('#ovPoll'),
+      pollBody: $('#pollBody'),
+      btnPollClose: $('#btnPollClose'),
+      btnPollOk: $('#btnPollOk'),
+
+      ovFinal: $('#ovFinal'),
+      finalChoiceText: $('#finalChoiceText'),
+      btnFinalClose: $('#btnFinalClose'),
+      btnFinalNo: $('#btnFinalNo'),
+      btnFinalYes: $('#btnFinalYes'),
+
+      ovResult: $('#ovResult'),
+      btnResultClose: $('#btnResultClose'),
+      rScore: $('#rScore'),
+      rCorrect: $('#rCorrect'),
+      rWrong: $('#rWrong'),
+      rTime: $('#rTime'),
+      rSet: $('#rSet'),
+      resultCanvas: $('#resultCanvas'),
+      btnRender: $('#btnRender'),
+      btnDownload: $('#btnDownload'),
+      btnPlayAgain: $('#btnPlayAgain'),
+
+      toast: $('#toast')
+    };
+
+    // =========================
+    // UI init
+    // =========================
+    function initBrand(){
+      el.gameTitle.textContent = CONFIG.text.gameTitle;
+      el.gameTagline.textContent = `${CONFIG.text.tagline} • Chế độ Học viên`;
+      el.logoBox.innerHTML = CONFIG.assets.logoSvg;
+    }
+
+    function buildSetOptions(){
+      el.selSet.innerHTML = '';
+      for (const s of CONFIG.questionSets){
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.name;
+        el.selSet.appendChild(opt);
+      }
+    }
+
+    function buildLadder(){
+      const n = state.total;
+      const pts = CONFIG.settings.pointsLadder.slice(0, n);
+      el.ladderList.innerHTML = '';
+      for (let i=0;i<n;i++){
+        const li = document.createElement('li');
+        li.className = 'step';
+        const level = i + 1;
+        const isSafe = CONFIG.settings.safeLevels.includes(level);
+        if (isSafe) li.classList.add('safe');
+
+        li.dataset.level = String(level);
+        li.innerHTML = `
+          <span class="n">#${String(level).padStart(2,'0')}</span>
+          <span class="muted2">${level <= 4 ? 'Warm-up' : (level <= 8 ? 'Core' : 'Boss')}</span>
+          <span class="p">${pts[i].toLocaleString('vi-VN')}</span>
+        `;
+        el.ladderList.appendChild(li);
+      }
+      updateLadder();
+    }
+
+    function toast(msg){
+      el.toast.textContent = msg;
+      el.toast.classList.add('show');
+      el.toast.style.opacity = '1';
+      el.toast.style.transform = 'translateX(-50%) translateY(0)';
+      window.clearTimeout(toast._t);
+      toast._t = window.setTimeout(()=>{
+        el.toast.style.opacity = '0';
+        el.toast.style.transform = 'translateX(-50%) translateY(6px)';
+        window.setTimeout(()=> el.toast.classList.remove('show'), 160);
+      }, 1600);
+    }
+
+    function setOverlay(overlayEl, show){
+      overlayEl.classList.toggle('show', !!show);
+      if (show){
+        // focus first input/button
+        const focusable = overlayEl.querySelector('input,button,select,[tabindex]');
+        if (focusable) focusable.focus();
+      }
+    }
+
+    // =========================
+    // Data selection
+    // =========================
+    function getSetById(id){
+      return CONFIG.questionSets.find(s => s.id === id) || CONFIG.questionSets[0];
+    }
+
+    function loadSet(id){
+      const set = getSetById(id);
+      state.setId = set.id;
+      state.questions = set.questions.slice(0, state.total).map((q, i) => ({...q, level: i+1}));
+      state.backup = set.backup.slice();
+      el.setName.textContent = `Bộ đề: ${set.name}`;
+      el.selSet.value = set.id;
+      el.rSet.textContent = set.name;
+      return set;
+    }
+
+    // =========================
+    // Game control
+    // =========================
+    function hardReset(keepSet=true){
+      stopTimer();
+
+      state.running = false;
+      state.paused = false;
+
+      state.idx = -1;
+      state.selected = null;
+      state.locked = false;
+      state.revealed = false;
+
+      state.lifelines = { fifty:false, ask:false, swap:false };
+      state.fiftyEliminated = new Set();
+
+      state.score = 0;
+      state.streak = 0;
+
+      state.startedAt = 0;
+      state.totalElapsedSec = 0;
+      state.qStartedAt = 0;
+
+      state.history = [];
+
+      state.timePerQ = clamp(Number(el.inpTime.value || CONFIG.settings.timePerQuestionSec), 10, 300);
+      state.remain = state.timePerQ;
+
+      if (!keepSet){
+        loadSet(CONFIG.questionSets[0].id);
+      } else {
+        loadSet(state.setId);
+      }
+
+      renderAll();
+      setQuestionUIIdle();
+      updateTeacherState();
+    }
+
+    function startGame(){
+      if (state.running) return;
+      state.running = true;
+      state.paused = false;
+      state.startedAt = now();
+      state.totalElapsedSec = 0;
+      nextQuestion(true);
+      updateTeacherState();
+    }
+
+    function pauseGame(){
+      if (!state.running || state.paused) return;
+      state.paused = true;
+      stopTimer();
+      // accumulate elapsed total until pause moment
+      state.totalElapsedSec += (now() - state.startedAt) / 1000;
+      state.startedAt = now(); // reset base for resume
+      toast('Đã pause');
+      updateTeacherState();
+    }
+
+    function resumeGame(){
+      if (!state.running) { startGame(); return; }
+      if (!state.paused) return;
+      state.paused = false;
+      state.startedAt = now();
+      state.qStartedAt = now();
+      startTimer();
+      toast('Tiếp tục');
+      updateTeacherState();
+    }
+
+    function endGame(reason){
+      state.running = false;
+      state.paused = false;
+      stopTimer();
+
+      // accumulate total time
+      if (state.startedAt){
+        state.totalElapsedSec += (now() - state.startedAt) / 1000;
+      }
+
+      el.roundText.textContent = reason || 'Kết thúc';
+      updateTeacherState();
+      openResult();
+    }
+
+    function nextQuestion(isFirst=false){
+      stopTimer();
+
+      state.selected = null;
+      state.locked = false;
+      state.revealed = false;
+      state.fiftyEliminated = new Set();
+
+      state.idx = isFirst ? 0 : state.idx + 1;
+
+      if (state.idx >= state.total){
+        endGame('Hoàn thành tất cả câu!');
+        return;
+      }
+
+      // reset per question timer
+      state.remain = state.timePerQ;
+      state.qStartedAt = now();
+
+      renderQuestion();
+      clearFeedback();
+      startTimer();
+
+      el.roundText.textContent = `Câu ${state.idx+1}/${state.total}`;
+      updateTeacherState();
+    }
+
+    function setQuestionUIIdle(){
+      el.roundText.textContent = 'Chưa bắt đầu';
+      el.qText.innerHTML = `Nhấn <strong>Start</strong> để bắt đầu trò chơi.`;
+      el.aTxt.forEach(t => t.textContent = '—');
+      el.answers.forEach(b=>{
+        b.classList.remove('selected','locked','correct','wrong');
+        b.setAttribute('aria-disabled','true');
+      });
+      el.btnLock.disabled = true;
+      el.btnHint.disabled = true;
+      el.btnRevealStudent.disabled = true;
+      el.btnNextStudent.disabled = true;
+      el.btnStart.disabled = false;
+
+      el.hintBox.classList.remove('show');
+      el.explainBox.style.display = 'none';
+      el.statusLine.textContent = '';
+      el.timerText.textContent = fmtTime(state.remain);
+    }
+
+    // =========================
+    // Timer
+    // =========================
+    function stopTimer(){
+      if (state.timerId){
+        clearInterval(state.timerId);
+        state.timerId = null;
+      }
+    }
+
+    function startTimer(){
+      stopTimer();
+      if (!state.running || state.paused) return;
+
+      el.timerText.textContent = fmtTime(state.remain);
+
+      state.timerId = setInterval(()=>{
+        state.remain -= 0.25;
+        if (state.remain <= 0){
+          state.remain = 0;
+          el.timerText.textContent = fmtTime(0);
+          stopTimer();
+          onTimeout();
+          return;
+        }
+        el.timerText.textContent = fmtTime(state.remain);
+      }, 250);
+    }
+
+    function onTimeout(){
+      if (!state.running) return;
+      if (state.revealed) return;
+
+      el.statusLine.innerHTML = `<span class="warn">Hết giờ!</span> Không kịp chốt đáp án.`;
+      // time-out = wrong => end
+      revealAnswer(null, { timedOut:true });
+    }
+
+    // =========================
+    // Rendering
+    // =========================
+    function renderAll(){
+      updateHud();
+      updateLadder();
+      updateLifelinesUI();
+      updateModeUI();
+      updateStudentButtons();
+    }
+
+    function updateHud(){
+      el.scoreText.textContent = state.score.toLocaleString('vi-VN');
+      el.progressText.textContent = `${Math.max(0, state.idx+1)}/${state.total}`;
+      el.streakText.textContent = `Streak: ${state.streak}`;
+      el.timerText.textContent = fmtTime(state.remain);
+      el.prizeNow.textContent = (state.idx >= 0 && state.idx < state.total)
+        ? `Mức: #${String(state.idx+1).padStart(2,'0')} • ${CONFIG.settings.pointsLadder[state.idx].toLocaleString('vi-VN')}`
+        : '—';
+    }
+
+    function updateLadder(){
+      const steps = $$('.step', el.ladderList);
+      steps.forEach(step=>{
+        step.classList.remove('current','done');
+      });
+      const currentLevel = state.idx + 1;
+      steps.forEach(step=>{
+        const lvl = Number(step.dataset.level);
+        if (lvl === currentLevel) step.classList.add('current');
+        if (lvl < currentLevel) step.classList.add('done');
+      });
+    }
+
+    function updateLifelinesUI(){
+      el.life5050.classList.toggle('used', state.lifelines.fifty);
+      el.lifeAsk.classList.toggle('used', state.lifelines.ask);
+      el.lifeSwap.classList.toggle('used', state.lifelines.swap);
+
+      el.life5050.disabled = !state.running || state.revealed || state.locked || state.lifelines.fifty;
+      el.lifeAsk.disabled  = !state.running || state.revealed || state.locked || state.lifelines.ask;
+      el.lifeSwap.disabled = !state.running || state.revealed || state.locked || state.lifelines.swap;
+    }
+
+    function updateModeUI(){
+      const isTeacher = state.mode === 'teacher' && state.teacherAuthed;
+      el.modeBadge.innerHTML = isTeacher
+        ? `<span class="miniDot"></span><span>Teacher Mode</span>`
+        : `<span class="miniDot"></span><span>Student Mode</span>`;
+
+      el.gameTagline.textContent = `${CONFIG.text.tagline} • ${isTeacher ? 'Chế độ Giáo viên' : 'Chế độ Học viên'}`;
+      el.teacherPanel.classList.toggle('show', isTeacher);
+
+      // Student controls visible always, but enabled/disabled based on mode
+      el.btnRevealStudent.style.display = isTeacher ? 'none' : 'inline-flex';
+      el.btnNextStudent.style.display = isTeacher ? 'none' : 'inline-flex';
+    }
+
+    function updateStudentButtons(){
+      const canInteract = state.running && !state.paused && state.idx >= 0 && !state.revealed;
+
+      el.answers.forEach(btn=>{
+        btn.setAttribute('aria-disabled', String(!canInteract || state.locked || state.fiftyEliminated.has(Number(btn.dataset.idx))));
+      });
+
+      el.btnHint.disabled = !state.running || state.idx < 0;
+      el.btnLock.disabled = !canInteract || state.selected === null || state.locked;
+      el.btnRevealStudent.disabled = !state.running || state.idx < 0 || state.revealed || (state.mode === 'teacher' && state.teacherAuthed) || !state.locked;
+      el.btnNextStudent.disabled = !state.running || state.idx < 0 || !state.revealed;
+      el.btnStart.disabled = state.running && !state.paused;
+      updateHud();
+      updateLadder();
+      updateLifelinesUI();
+    }
+
+    function clearFeedback(){
+      el.statusLine.textContent = '';
+      el.explainBox.style.display = 'none';
+      el.explainBox.classList.remove('bad');
+    }
+
+    function renderQuestion(){
+      const q = state.questions[state.idx];
+      el.qText.textContent = q.q;
+
+      for (let i=0;i<4;i++){
+        el.aTxt[i].textContent = q.options[i];
+      }
+
+      el.answers.forEach(btn=>{
+        btn.classList.remove('selected','locked','correct','wrong');
+      });
+
+      // Hint availability
+      const hasHint = Boolean(q.hint && String(q.hint).trim());
+      el.btnHint.disabled = !hasHint;
+      if (!hasHint) el.hintBox.classList.remove('show');
+
+      // enable answers
+      el.answers.forEach(btn => btn.setAttribute('aria-disabled','false'));
+
+      // Student buttons initial
+      el.btnLock.disabled = true;
+      el.btnRevealStudent.disabled = true;
+      el.btnNextStudent.disabled = true;
+
+      updateStudentButtons();
+      updateTeacherState();
+    }
+
+    // =========================
+    // Answer selection / reveal
+    // =========================
+    function onSelectAnswer(i){
+      if (!state.running || state.paused || state.revealed) return;
+      if (state.locked) return;
+      if (state.fiftyEliminated.has(i)) return;
+
+      state.selected = i;
+      el.answers.forEach(btn => btn.classList.toggle('selected', Number(btn.dataset.idx) === i));
+      el.statusLine.textContent = '';
+      updateStudentButtons();
+    }
+
+    function openFinalConfirm(){
+      if (!state.running || state.paused || state.revealed) return;
+      if (state.selected === null) return;
+      if (state.locked) return;
+
+      const q = state.questions[state.idx];
+      const key = ['A','B','C','D'][state.selected];
+      el.finalChoiceText.textContent = `${key}. ${q.options[state.selected]}`;
+      setOverlay(el.ovFinal, true);
+    }
+
+    function lockAnswer(){
+      if (!state.running || state.paused || state.revealed) return;
+      if (state.selected === null || state.locked) return;
+
+      state.locked = true;
+      el.answers.forEach(btn=>{
+        const idx = Number(btn.dataset.idx);
+        btn.classList.toggle('locked', idx === state.selected);
+      });
+
+      el.statusLine.innerHTML = `Đã chốt đáp án: <strong>${['A','B','C','D'][state.selected]}</strong>.`;
+
+      // In Student mode: auto reveal unless teacher mode with Manual Reveal enabled
+      if (!(state.mode === 'teacher' && state.teacherAuthed && state.manualReveal)){
+        // small delay for dramatic effect
+        setTimeout(()=> revealAnswer(state.selected), 450);
+      } else {
+        toast('Chờ giáo viên bấm Reveal');
+      }
+
+      updateStudentButtons();
+      updateTeacherState();
+    }
+
+    function revealAnswer(chosenIndex, opts={}){
+      if (!state.running || state.paused) return;
+      if (state.revealed) return;
+
+      state.revealed = true;
+      stopTimer();
+
+      const q = state.questions[state.idx];
+      const correct = q.answerIndex;
+      const isCorrect = (chosenIndex === correct);
+
+      // time spent
+      const spent = clamp(state.timePerQ - state.remain, 0, state.timePerQ);
+
+      // mark UI
+      el.answers.forEach(btn=>{
+        const i = Number(btn.dataset.idx);
+        btn.classList.remove('locked');
+        if (i === correct) btn.classList.add('correct');
+        if (chosenIndex !== null && i === chosenIndex && !isCorrect) btn.classList.add('wrong');
+        btn.setAttribute('aria-disabled','true');
+      });
+
+      // Explanation
+      const exp = q.explanation ? String(q.explanation) : '';
+      if (exp){
+        el.explainText.textContent = exp;
+        el.explainBox.style.display = 'block';
+        el.explainBox.classList.toggle('bad', !isCorrect);
+      }
+
+      // status + scoring
+      if (opts.timedOut){
+        el.statusLine.innerHTML = `<span class="no">Sai</span> (Hết giờ) • Đáp án đúng: <strong>${['A','B','C','D'][correct]}</strong>`;
+      } else if (chosenIndex === null){
+        el.statusLine.innerHTML = `<span class="no">Sai</span> • Bạn chưa chốt đáp án • Đúng: <strong>${['A','B','C','D'][correct]}</strong>`;
+      } else if (isCorrect){
+        el.statusLine.innerHTML = `<span class="ok">Đúng!</span> • +${CONFIG.settings.pointsLadder[state.idx].toLocaleString('vi-VN')} điểm`;
+      } else {
+        el.statusLine.innerHTML = `<span class="no">Sai</span> • Đáp án đúng: <strong>${['A','B','C','D'][correct]}</strong>`;
+      }
+
+      // record history
+      state.history.push({
+        q: q.q,
+        options: q.options.slice(),
+        correctIndex: correct,
+        chosenIndex: chosenIndex,
+        isCorrect: isCorrect,
+        timeSpentSec: spent,
+        used: {
+          fifty: state.lifelines.fifty,
+          ask: state.lifelines.ask,
+          swap: state.lifelines.swap
+        }
+      });
+
+      if (isCorrect){
+        state.score += CONFIG.settings.pointsLadder[state.idx];
+        state.streak += 1;
+
+        if (state.streak > 0 && (state.streak % CONFIG.settings.streakBonusEvery === 0)){
+          state.score += CONFIG.settings.streakBonusPoints;
+          toast(`Streak bonus +${CONFIG.settings.streakBonusPoints}!`);
+        }
+
+        // enable next
+        if (state.mode === 'teacher' && state.teacherAuthed){
+          // teacher controls next
+          toast('Đúng! Giáo viên bấm Next');
+        } else {
+          el.btnNextStudent.disabled = false;
+          toast('Đúng! Bấm Next');
+        }
+      } else {
+        // wrong: end game (Millionaire style)
+        state.streak = 0;
+
+        // compute "safe" payout (optional, keep for summary only)
+        const safe = getSafeScore();
+        if (safe > 0){
+          toast(`Game over • Mốc an toàn: ${safe.toLocaleString('vi-VN')}`);
+        } else {
+          toast('Game over');
+        }
+
+        // stop and show result
+        endGame('Game over');
+      }
+
+      updateStudentButtons();
+      updateTeacherState();
+      updateHud();
+      updateLadder();
+    }
+
+    function getSafeScore(){
+      // Highest safe level passed (answered correctly) -> score at that level
+      const safeLvls = CONFIG.settings.safeLevels.slice().sort((a,b)=>a-b);
+      let best = 0;
+      for (const lvl of safeLvls){
+        if (state.idx + 1 >= lvl){
+          // if we are past or at safe level, and all previous correct? Millionaire normally ends on wrong,
+          // but for display: best safe = sum points up to that lvl
+          const pts = CONFIG.settings.pointsLadder.slice(0, lvl).reduce((a,b)=>a+b, 0);
+          best = pts;
+        }
+      }
+      return best;
+    }
+
+    // =========================
+    // Lifelines
+    // =========================
+    function use5050(){
+      if (state.lifelines.fifty || !state.running || state.locked || state.revealed) return;
+
+      const q = state.questions[state.idx];
+      const correct = q.answerIndex;
+      const wrongs = [0,1,2,3].filter(i => i !== correct);
+      const keepWrong = wrongs[Math.floor(rand01()*wrongs.length)];
+      const eliminate = wrongs.filter(i => i !== keepWrong);
+      state.fiftyEliminated = new Set(eliminate);
+      state.lifelines.fifty = true;
+
+      // visually disable eliminated
+      el.answers.forEach(btn=>{
+        const i = Number(btn.dataset.idx);
+        if (state.fiftyEliminated.has(i)){
+          btn.setAttribute('aria-disabled','true');
+          btn.classList.remove('selected');
+        }
+      });
+
+      if (state.selected !== null && state.fiftyEliminated.has(state.selected)){
+        state.selected = null;
+      }
+
+      toast('Đã dùng 50:50');
+      updateLifelinesUI();
+      updateStudentButtons();
+      updateTeacherState();
+    }
+
+    function useAskClass(){
+      if (state.lifelines.ask || !state.running || state.locked || state.revealed) return;
+
+      state.lifelines.ask = true;
+      updateLifelinesUI();
+      updateTeacherState();
+
+      const q = state.questions[state.idx];
+      const correct = q.answerIndex;
+      const difficulty = (state.idx + 1) / state.total; // 0..1
+
+      // bias: easy => strong toward correct; hard => flatter
+      const baseCorrect = 0.70 - (0.35 * difficulty); // 0.70 -> 0.35
+      const noise = (rand01() - 0.5) * 0.10;          // ±0.05
+      let pCorrect = clamp(baseCorrect + noise, 0.28, 0.78);
+
+      const remaining = 1 - pCorrect;
+      const others = [0,1,2,3].filter(i => i !== correct);
+      const splits = shuffle([rand01(), rand01(), rand01()]);
+      const sum = splits.reduce((a,b)=>a+b, 0.00001);
+      const dist = {};
+      dist[correct] = pCorrect;
+      for (let i=0;i<3;i++){
+        dist[others[i]] = remaining * (splits[i]/sum);
+      }
+
+      // convert to 100% integers with rounding
+      let perc = [0,0,0,0].map((_,i)=>Math.round(dist[i]*100));
+      let diff100 = 100 - perc.reduce((a,b)=>a+b,0);
+      // fix rounding diff
+      while (diff100 !== 0){
+        const k = Math.floor(rand01()*4);
+        if (diff100 > 0){ perc[k] += 1; diff100 -= 1; }
+        else if (perc[k] > 0){ perc[k] -= 1; diff100 += 1; }
+      }
+
+      renderPoll(perc);
+      setOverlay(el.ovPoll, true);
+
+      // animate bars after open
+      requestAnimationFrame(()=>{
+        $$('#pollBody .bar > i').forEach((bar, i)=>{
+          bar.style.width = perc[i] + '%';
+        });
+      });
+    }
+
+    function renderPoll(perc){
+      el.pollBody.innerHTML = '';
+      const keys = ['A','B','C','D'];
+      for (let i=0;i<4;i++){
+        const row = document.createElement('div');
+        row.className = 'barRow';
+        row.innerHTML = `
+          <div class="barKey" aria-hidden="true">${keys[i]}</div>
+          <div class="bar" aria-label="Tỷ lệ ${keys[i]}"><i></i></div>
+          <div class="pct">${perc[i]}%</div>
+        `;
+        el.pollBody.appendChild(row);
+      }
+    }
+
+    function useSwap(){
+      if (state.lifelines.swap || !state.running || state.locked || state.revealed) return;
+
+      const level = state.idx + 1;
+      const b = state.backup.shift();
+      if (!b){
+        toast('Không còn câu dự phòng');
+        state.lifelines.swap = true; // still consumed to avoid repeated clicks
+        updateLifelinesUI();
+        return;
+      }
+
+      // replace current question (keep same level)
+      const replaced = {...b, level};
+      state.questions[state.idx] = replaced;
+      state.lifelines.swap = true;
+      state.selected = null;
+      state.fiftyEliminated = new Set();
+
+      toast('Đã đổi câu');
+      renderQuestion();
+      updateLifelinesUI();
+      updateStudentButtons();
+      updateTeacherState();
+    }
+
+    // =========================
+    // Teacher mode
+    // =========================
+    function openTeacherLogin(){
+      el.inpPass.value = '';
+      el.passStatus.textContent = 'Chưa xác thực';
+      setOverlay(el.ovTeacher, true);
+    }
+
+    function authTeacher(){
+      const pass = String(el.inpPass.value || '').trim();
+      if (pass === CONFIG.text.teacherPass){
+        state.teacherAuthed = true;
+        state.mode = 'teacher';
+        el.passStatus.textContent = '✅ Đúng mật khẩu. Teacher Mode đã bật.';
+        setOverlay(el.ovTeacher, false);
+        el.teacherPanel.classList.add('show');
+        updateModeUI();
+        updateTeacherState();
+        toast('Teacher Mode: ON');
+      } else {
+        el.passStatus.textContent = '❌ Sai mật khẩu. Thử lại.';
+        el.inpPass.focus();
+      }
+    }
+
+    function closeTeacher(){
+      state.mode = 'student';
+      // keep authed true for convenience; just hide panel
+      updateModeUI();
+      updateTeacherState();
+      toast('Teacher Mode: OFF');
+    }
+
+    function updateTeacherState(){
+      const isTeacher = state.mode === 'teacher' && state.teacherAuthed;
+      if (!isTeacher){
+        el.teacherState.textContent = '—';
+        return;
+      }
+      let s = 'Ready';
+      if (!state.running) s = 'Ready • chưa chạy';
+      else if (state.paused) s = 'Paused';
+      else if (state.revealed) s = 'Revealed • chờ Next';
+      else if (state.locked) s = 'Locked • chờ Reveal';
+      else s = 'Running • chờ chọn đáp án';
+      el.teacherState.textContent = s;
+
+      el.tBtnReveal.disabled = !state.running || state.paused || state.revealed || (!state.locked && state.remain > 0);
+      el.tBtnNext.disabled = !state.running || state.paused || !state.revealed;
+      el.tBtnPause.disabled = !state.running || state.paused;
+      el.tBtnStart.disabled = (state.running && !state.paused);
+
+      // teacher inputs
+      el.inpTime.value = String(state.timePerQ);
+      el.selSet.value = state.setId;
+      el.swManual.classList.toggle('on', state.manualReveal);
+      el.swManual.setAttribute('aria-checked', String(!!state.manualReveal));
+    }
+
+    function teacherStartResume(){
+      if (!state.running) startGame();
+      else resumeGame();
+    }
+
+    function teacherReveal(){
+      if (!state.running || state.paused || state.revealed) return;
+      // if locked, reveal with selected; else treat as no lock
+      if (!state.locked){
+        revealAnswer(null);
+      } else {
+        revealAnswer(state.selected);
+      }
+    }
+
+    function teacherNext(){
+      if (!state.running || state.paused || !state.revealed) return;
+      nextQuestion(false);
+    }
+
+    function teacherApplySet(){
+      const newId = el.selSet.value;
+      if (!newId) return;
+
+      if (state.running){
+        // switching set mid game resets (no confirm to keep class flow)
+        toast('Đổi bộ đề → Reset ván');
+      }
+      loadSet(newId);
+      hardReset(true);
+    }
+
+    function teacherApplyTime(){
+      const n = clamp(Number(el.inpTime.value || CONFIG.settings.timePerQuestionSec), 10, 300);
+      state.timePerQ = n;
+      if (!state.running || state.idx < 0){
+        state.remain = n;
+        updateHud();
+      }
+      toast(`Timer: ${n}s/câu`);
+      updateTeacherState();
+    }
+
+    function toggleManualReveal(){
+      state.manualReveal = !state.manualReveal;
+      el.swManual.classList.toggle('on', state.manualReveal);
+      el.swManual.setAttribute('aria-checked', String(!!state.manualReveal));
+      toast(`Manual Reveal: ${state.manualReveal ? 'ON' : 'OFF'}`);
+      updateTeacherState();
+    }
+
+    // =========================
+    // Result image export (canvas)
+    // =========================
+    function openResult(){
+      // fill numbers
+      const correct = state.history.filter(x=>x.isCorrect).length;
+      const wrong = state.history.filter(x=>!x.isCorrect).length;
+      el.rScore.textContent = state.score.toLocaleString('vi-VN');
+      el.rCorrect.textContent = String(correct);
+      el.rWrong.textContent = String(wrong);
+      el.rTime.textContent = fmtTime(state.totalElapsedSec);
+      el.rSet.textContent = getSetById(state.setId).name;
+
+      // auto render once
+      renderResultCanvas();
+      setOverlay(el.ovResult, true);
+    }
+
+    function renderResultCanvas(){
+      const c = el.resultCanvas;
+      const ctx = c.getContext('2d');
+      const W = c.width, H = c.height;
+
+      // background
+      const g = ctx.createLinearGradient(0,0,0,H);
+      g.addColorStop(0, '#07122a');
+      g.addColorStop(1, '#06101f');
+      ctx.fillStyle = g;
+      ctx.fillRect(0,0,W,H);
+
+      // glow blobs
+      function blob(x,y,r, col){
+        const gg = ctx.createRadialGradient(x,y,0,x,y,r);
+        gg.addColorStop(0, col);
+        gg.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = gg;
+        ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+      }
+      blob(260,160,240,'rgba(74,163,255,.24)');
+      blob(980,140,260,'rgba(47,125,255,.18)');
+      blob(860,560,260,'rgba(59,226,143,.12)');
+
+      // grid lines
+      ctx.globalAlpha = 0.22;
+      ctx.strokeStyle = 'rgba(255,255,255,.16)';
+      ctx.lineWidth = 1;
+      for (let x=60;x<W;x+=80){ ctx.beginPath(); ctx.moveTo(x,40); ctx.lineTo(x,H-40); ctx.stroke(); }
+      for (let y=60;y<H;y+=80){ ctx.beginPath(); ctx.moveTo(40,y); ctx.lineTo(W-40,y); ctx.stroke(); }
+      ctx.globalAlpha = 1;
+
+      // title
+      ctx.fillStyle = 'rgba(234,241,255,.95)';
+      ctx.font = '800 44px ' + CONFIG.assets.fontFamily || 'system-ui';
+      ctx.font = '800 44px ' + 'system-ui';
+      ctx.fillText(CONFIG.text.gameTitle, 64, 92);
+
+      ctx.fillStyle = 'rgba(234,241,255,.72)';
+      ctx.font = '600 20px system-ui';
+      ctx.fillText(`${CONFIG.text.tagline} • ${getSetById(state.setId).name}`, 64, 124);
+
+      // stats cards
+      const stats = [
+        { k:'SCORE', v: state.score.toLocaleString('vi-VN') },
+        { k:'CORRECT', v: String(state.history.filter(x=>x.isCorrect).length) },
+        { k:'WRONG', v: String(state.history.filter(x=>!x.isCorrect).length) },
+        { k:'TIME', v: fmtTime(state.totalElapsedSec) },
+      ];
+
+      const cardX = 64, cardY = 160, cardW = 260, cardH = 92, gap = 16;
+      stats.forEach((s,i)=>{
+        const x = cardX + i*(cardW+gap);
+        const y = cardY;
+        // card
+        ctx.fillStyle = 'rgba(255,255,255,.06)';
+        ctx.strokeStyle = 'rgba(255,255,255,.14)';
+        roundRect(ctx, x, y, cardW, cardH, 18);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = 'rgba(234,241,255,.62)';
+        ctx.font = '700 14px system-ui';
+        ctx.fillText(s.k, x+18, y+30);
+
+        ctx.fillStyle = 'rgba(234,241,255,.95)';
+        ctx.font = '900 28px system-ui';
+        ctx.fillText(s.v, x+18, y+68);
+      });
+
+      // list results (last/first)
+      const listX = 64, listY = 280, listW = W-128, listH = H-340;
+      ctx.fillStyle = 'rgba(255,255,255,.05)';
+      ctx.strokeStyle = 'rgba(255,255,255,.14)';
+      roundRect(ctx, listX, listY, listW, listH, 22);
+      ctx.fill(); ctx.stroke();
+
+      ctx.fillStyle = 'rgba(234,241,255,.75)';
+      ctx.font = '800 16px system-ui';
+      ctx.fillText('Chi tiết (tối đa 10 dòng)', listX+18, listY+34);
+
+      const lines = state.history.slice(0, 10);
+      const lineStartY = listY + 64;
+      const lh = 28;
+
+      ctx.font = '600 14px system-ui';
+      lines.forEach((h, i)=>{
+        const y = lineStartY + i*lh;
+        const lvl = i + 1;
+        const cKey = ['A','B','C','D'][h.correctIndex];
+        const uKey = (h.chosenIndex === null || h.chosenIndex === undefined) ? '—' : ['A','B','C','D'][h.chosenIndex];
+
+        // status dot
+        ctx.fillStyle = h.isCorrect ? 'rgba(59,226,143,.95)' : 'rgba(255,77,109,.95)';
+        ctx.beginPath(); ctx.arc(listX+22, y-6, 6, 0, Math.PI*2); ctx.fill();
+
+        ctx.fillStyle = 'rgba(234,241,255,.88)';
+        const qShort = ellipsis(h.q, 72);
+        ctx.fillText(`#${String(lvl).padStart(2,'0')}  ${qShort}`, listX+38, y);
+
+        ctx.fillStyle = 'rgba(234,241,255,.62)';
+        ctx.fillText(`Bạn: ${uKey}  |  Đúng: ${cKey}  |  ${Math.round(h.timeSpentSec)}s`, listX + listW - 320, y);
+      });
+
+      // footer
+      ctx.fillStyle = 'rgba(234,241,255,.52)';
+      ctx.font = '600 12px system-ui';
+      ctx.fillText(`Generated in-browser • ${new Date().toLocaleString('vi-VN')}`, 64, H-52);
+      ctx.fillText(`${CONFIG.text.brand}`, W-64-ctx.measureText(CONFIG.text.brand).width, H-52);
+
+      // set download
+      const url = c.toDataURL('image/png');
+      el.btnDownload.href = url;
+    }
+
+    function roundRect(ctx, x, y, w, h, r){
+      const rr = Math.min(r, w/2, h/2);
+      ctx.beginPath();
+      ctx.moveTo(x+rr, y);
+      ctx.arcTo(x+w, y, x+w, y+h, rr);
+      ctx.arcTo(x+w, y+h, x, y+h, rr);
+      ctx.arcTo(x, y+h, x, y, rr);
+      ctx.arcTo(x, y, x+w, y, rr);
+      ctx.closePath();
+    }
+
+    function ellipsis(str, max){
+      const s = String(str || '');
+      if (s.length <= max) return s;
+      return s.slice(0, max-1) + '…';
+    }
+
+    // =========================
+    // Events
+    // =========================
+    function bindEvents(){
+      // answer buttons
+      el.answers.forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const disabled = btn.getAttribute('aria-disabled') === 'true';
+          if (disabled) return;
+          onSelectAnswer(Number(btn.dataset.idx));
+        });
+      });
+
+      el.btnStart.addEventListener('click', ()=>{
+        if (!state.running) startGame();
+        else if (state.paused) resumeGame();
+      });
+
+      el.btnHint.addEventListener('click', ()=>{
+        if (!state.running || state.idx < 0) return;
+        const q = state.questions[state.idx];
+        if (!q.hint) { toast('Không có hint'); return; }
+        el.hintText.textContent = q.hint;
+        el.hintBox.classList.toggle('show');
+      });
+
+      el.btnLock.addEventListener('click', openFinalConfirm);
+
+      el.btnRevealStudent.addEventListener('click', ()=>{
+        if (state.mode === 'teacher' && state.teacherAuthed) return;
+        if (!state.locked) { toast('Hãy chốt đáp án trước'); return; }
+        revealAnswer(state.selected);
+      });
+
+      el.btnNextStudent.addEventListener('click', ()=>{
+        if (state.mode === 'teacher' && state.teacherAuthed) return;
+        if (!state.revealed) return;
+        nextQuestion(false);
+      });
+
+      el.btnReset.addEventListener('click', ()=>{
+        hardReset(true);
+        toast('Đã reset');
+      });
+
+      el.btnTeacher.addEventListener('click', ()=>{
+        if (state.teacherAuthed){
+          state.mode = 'teacher';
+          updateModeUI();
+          updateTeacherState();
+          toast('Teacher Mode: ON');
+        } else {
+          openTeacherLogin();
+        }
+      });
+
+      el.btnTeacherClose.addEventListener('click', closeTeacher);
+      el.btnTeacherCancel.addEventListener('click', ()=> setOverlay(el.ovTeacher, false));
+      el.btnTeacherOk.addEventListener('click', authTeacher);
+      el.inpPass.addEventListener('keydown', (e)=>{
+        if (e.key === 'Enter') authTeacher();
+      });
+
+      // teacher panel controls
+      el.tBtnStart.addEventListener('click', teacherStartResume);
+      el.tBtnPause.addEventListener('click', pauseGame);
+      el.tBtnReveal.addEventListener('click', teacherReveal);
+      el.tBtnNext.addEventListener('click', teacherNext);
+      el.tBtnReset.addEventListener('click', ()=>{ hardReset(true); toast('Đã reset'); });
+
+      el.selSet.addEventListener('change', teacherApplySet);
+      el.inpTime.addEventListener('change', teacherApplyTime);
+
+      // toggle manual reveal
+      el.swManual.addEventListener('click', toggleManualReveal);
+      el.swManual.addEventListener('keydown', (e)=>{
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleManualReveal(); }
+      });
+
+      // lifelines
+      el.life5050.addEventListener('click', use5050);
+      el.lifeAsk.addEventListener('click', useAskClass);
+      el.lifeSwap.addEventListener('click', useSwap);
+
+      // poll overlay
+      el.btnPollClose.addEventListener('click', ()=> setOverlay(el.ovPoll, false));
+      el.btnPollOk.addEventListener('click', ()=> setOverlay(el.ovPoll, false));
+
+      // final confirm overlay
+      el.btnFinalClose.addEventListener('click', ()=> setOverlay(el.ovFinal, false));
+      el.btnFinalNo.addEventListener('click', ()=> setOverlay(el.ovFinal, false));
+      el.btnFinalYes.addEventListener('click', ()=>{
+        setOverlay(el.ovFinal, false);
+        lockAnswer();
+      });
+
+      // export / result
+      el.btnExport.addEventListener('click', openResult);
+      el.btnResultClose.addEventListener('click', ()=> setOverlay(el.ovResult, false));
+      el.btnPlayAgain.addEventListener('click', ()=>{
+        setOverlay(el.ovResult, false);
+        hardReset(true);
+        toast('Sẵn sàng chơi lại');
+      });
+      el.btnRender.addEventListener('click', ()=>{
+        renderResultCanvas();
+        toast('Đã render ảnh');
+      });
+
+      // keyboard shortcuts (lightweight)
+      document.addEventListener('keydown', (e)=>{
+        if (e.key === 'Escape'){
+          // close overlays if open
+          [el.ovTeacher, el.ovPoll, el.ovFinal, el.ovResult].forEach(ov=>{
+            if (ov.classList.contains('show')) ov.classList.remove('show');
+          });
+        }
+        // student hotkeys: A/B/C/D to select
+        if (state.mode === 'student' && state.running && !state.paused && !state.locked && !state.revealed){
+          const k = e.key.toLowerCase();
+          const map = { a:0, b:1, c:2, d:3 };
+          if (k in map){
+            const idx = map[k];
+            if (!state.fiftyEliminated.has(idx)) onSelectAnswer(idx);
+          }
+        }
+      }, { passive:true });
+    }
+
+    // =========================
+    // Boot
+    // =========================
+    function boot(){
+      initBrand();
+      buildSetOptions();
+
+      loadSet(state.setId);
+
+      state.total = clamp(CONFIG.settings.totalQuestions, 10, 15);
+      state.timePerQ = clamp(CONFIG.settings.timePerQuestionSec, 10, 300);
+      el.inpTime.value = String(state.timePerQ);
+
+      buildLadder();
+      hardReset(true);
+
+      bindEvents();
+      renderAll();
+    }
+
+    boot();
+  </script>
+</body>
+</html>
