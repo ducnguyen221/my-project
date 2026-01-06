@@ -1,0 +1,1963 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Flappy n8n — Mini Game Lớp Học</title>
+  <style>
+    :root{
+      --bg0:#060b1a;
+      --bg1:#0b1533;
+      --card:#0c1b3f;
+      --card2:#0a1433;
+      --fg:#eaf0ff;
+      --muted:#a9b7e5;
+      --blue:#4aa3ff;
+      --blue2:#2b6dff;
+      --green:#31d39a;
+      --red:#ff5b6a;
+      --amber:#ffcc66;
+      --shadow: 0 14px 45px rgba(0,0,0,.45);
+      --shadow2: 0 10px 22px rgba(0,0,0,.35);
+      --radius-xl: 22px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 10px;
+      --ring: 0 0 0 3px rgba(74,163,255,.28);
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: var(--font);
+      color: var(--fg);
+      background:
+        radial-gradient(1100px 650px at 20% 15%, rgba(74,163,255,.18), transparent 55%),
+        radial-gradient(1100px 700px at 90% 20%, rgba(49,211,154,.12), transparent 60%),
+        radial-gradient(900px 600px at 60% 95%, rgba(43,109,255,.12), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+
+    button, input, select{ font:inherit; color:inherit; }
+
+    .app{ min-height:100%; display:flex; flex-direction:column; }
+
+    /* ===== Header (ONE ROW) ===== */
+    header.topbar{
+      position: sticky;
+      top: 0;
+      z-index: 60;
+      background: linear-gradient(180deg, rgba(6,11,26,.92), rgba(6,11,26,.72));
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .topbar-inner{
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 10px 12px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      min-width: 230px;
+    }
+    .logo{
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display:grid;
+      place-items:center;
+      background: linear-gradient(135deg, rgba(74,163,255,.22), rgba(43,109,255,.16));
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow2);
+      flex: 0 0 auto;
+    }
+    .brand-title{
+      display:flex;
+      flex-direction:column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .brand-title strong{
+      font-size: 14px;
+      font-weight: 850;
+      letter-spacing: .2px;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .brand-title small{
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 290px;
+    }
+
+    .stats{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      overflow:auto;
+      padding-bottom: 2px;
+      scrollbar-width: thin;
+    }
+    .stats::-webkit-scrollbar{ height: 8px; }
+    .stats::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.10); border-radius: 999px; }
+
+    .pill{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 6px 18px rgba(0,0,0,.25);
+      font-size: 12px;
+      user-select:none;
+      white-space:nowrap;
+      flex: 0 0 auto;
+    }
+    .pill .k{ color: var(--muted); font-weight: 650; }
+    .pill .v{ font-variant-numeric: tabular-nums; font-weight: 850; }
+
+    .dot{ width: 8px; height: 8px; border-radius: 999px; background: rgba(255,255,255,.22); box-shadow: 0 0 0 2px rgba(255,255,255,.08) inset; }
+    .dot.live{ background: var(--green); box-shadow: 0 0 0 2px rgba(49,211,154,.25) inset, 0 0 20px rgba(49,211,154,.22); }
+    .dot.pause{ background: var(--amber); box-shadow: 0 0 0 2px rgba(255,204,102,.25) inset, 0 0 18px rgba(255,204,102,.18); }
+    .dot.over{ background: var(--red); box-shadow: 0 0 0 2px rgba(255,91,106,.25) inset, 0 0 18px rgba(255,91,106,.18); }
+
+    .actions{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content:flex-end;
+      white-space: nowrap;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      cursor:pointer;
+      box-shadow: 0 10px 20px rgba(0,0,0,.25);
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+      user-select:none;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.16); }
+    .btn:active{ transform: translateY(0px); }
+    .btn.primary{ background: linear-gradient(135deg, rgba(74,163,255,.22), rgba(43,109,255,.18)); border-color: rgba(74,163,255,.22); }
+    .btn.danger{ background: linear-gradient(135deg, rgba(255,91,106,.16), rgba(255,91,106,.10)); border-color: rgba(255,91,106,.22); }
+    .btn.ghost{ background: transparent; border-color: rgba(255,255,255,.14); box-shadow:none; }
+    .btn:focus-visible{ outline:none; box-shadow: var(--ring), 0 10px 20px rgba(0,0,0,.25); }
+    .btn svg{ width:18px; height:18px; opacity:.95; }
+
+    /* compact on small screens: keep one row by hiding labels */
+    @media (max-width: 860px){
+      .topbar-inner{ grid-template-columns: auto 1fr auto; }
+      .brand{ min-width: 0; }
+      .brand-title small{ display:none; }
+      .btn span.txt{ display:none; }
+      .btn{ padding: 10px 10px; }
+    }
+
+    main{ flex:1 1 auto; padding: 14px 12px 18px; display:flex; justify-content:center; }
+    .wrap{ width:min(1200px,100%); display:grid; gap: 12px; }
+
+    .stage{
+      position:relative;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(180deg, rgba(12,27,63,.86), rgba(10,20,51,.78));
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .canvas-shell{ position:relative; width:100%; aspect-ratio: 16/9; }
+
+    canvas#game{
+      position:relative;
+      z-index: 1;
+      width:100%;
+      height:100%;
+      display:block;
+    }
+
+    .overlay{
+      position:absolute;
+      inset:0;
+      z-index: 10;
+      display:grid;
+      place-items:center;
+      padding: 16px;
+      background: linear-gradient(180deg, rgba(6,11,26,.55), rgba(6,11,26,.82));
+      pointer-events: auto;
+    }
+    .overlay[hidden]{ display:none !important; }
+
+    .panel{
+      width:min(920px, 100%);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(180deg, rgba(12,27,63,.92), rgba(10,20,51,.88));
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      animation: inUp .22s ease both;
+    }
+
+    @keyframes inUp{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+    .panel-head{ display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .panel-head h2{ margin:0; font-size:18px; font-weight:900; letter-spacing:.2px; }
+    .panel-head p{ margin: 4px 0 0; color: var(--muted); font-size:13px; line-height:1.45; }
+
+    .grid{
+      margin-top: 12px;
+      display:grid;
+      gap: 12px;
+      grid-template-columns: 1.2fr .8fr;
+    }
+    @media (max-width: 860px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.10);
+      padding: 12px;
+      box-shadow: 0 10px 20px rgba(0,0,0,.18);
+    }
+
+    .card h3{
+      margin:0 0 10px;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing:.2px;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+
+    .sub{ margin: 0 0 10px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+    .form-row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+    label{ display:flex; flex-direction:column; gap:6px; font-size:12px; color: var(--muted); min-width: 220px; flex: 1 1 220px; }
+
+    select, input[type="number"], input[type="password"]{
+      width:100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(6,11,26,.45);
+      outline:none;
+      transition: box-shadow .12s ease, border-color .12s ease, background .12s ease;
+    }
+    select:focus, input:focus{ box-shadow: var(--ring); border-color: rgba(74,163,255,.35); background: rgba(6,11,26,.62); }
+
+    .hint{
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(74,163,255,.10);
+      border: 1px solid rgba(74,163,255,.18);
+      color: rgba(234,240,255,.92);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .kbd{
+      display:inline-flex;
+      align-items:center;
+      padding: 2px 8px;
+      border-radius: 9px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      font-size: 12px;
+    }
+
+    .toast{
+      position:absolute;
+      left: 50%;
+      bottom: 14px;
+      transform: translateX(-50%);
+      z-index: 20;
+      width:min(720px, 92%);
+      border-radius: 999px;
+      padding: 10px 12px;
+      background: rgba(6,11,26,.72);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 10px 24px rgba(0,0,0,.35);
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content:center;
+      opacity: 0;
+      pointer-events:none;
+      transition: opacity .16s ease, transform .16s ease;
+      color: rgba(234,240,255,.92);
+      font-size: 12px;
+    }
+    .toast.show{ opacity:1; transform: translateX(-50%) translateY(-2px); }
+    .toast .tag{ padding: 3px 8px; border-radius: 999px; font-weight: 900; border:1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.05); }
+    .tag.ok{ border-color: rgba(49,211,154,.22); background: rgba(49,211,154,.10); }
+    .tag.bad{ border-color: rgba(255,91,106,.25); background: rgba(255,91,106,.10); }
+
+    /* ===== Modal ===== */
+    .modal{
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display:grid;
+      place-items:center;
+      padding: 16px;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      pointer-events:none;
+      transition: opacity .18s ease;
+    }
+    .modal.open{ opacity: 1; pointer-events:auto; }
+
+    .modal-card{
+      width: min(920px, 100%);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(180deg, rgba(12,27,63,.96), rgba(10,20,51,.94));
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      animation: inUp .20s ease both;
+    }
+
+    .modal-head{
+      padding: 14px 14px 12px;
+      display:flex;
+      gap: 12px;
+      align-items:flex-start;
+      justify-content:space-between;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), transparent);
+    }
+    .modal-title{ display:flex; flex-direction:column; gap:4px; min-width: 0; }
+    .modal-title strong{ font-size: 15px; font-weight: 950; letter-spacing:.2px; }
+    .modal-title span{ color: var(--muted); font-size: 12px; }
+    .modal-body{ padding: 14px; display:grid; gap: 12px; }
+
+    .q{ font-size: 15px; line-height: 1.45; font-weight: 800; margin:0; }
+
+    .choices{ display:grid; gap: 10px; grid-template-columns: 1fr 1fr; }
+    @media (max-width: 680px){ .choices{ grid-template-columns: 1fr; } }
+
+    .choice{
+      text-align:left;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      cursor:pointer;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+    }
+    .choice:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.07); }
+    .choice:focus-visible{ outline:none; box-shadow: var(--ring); }
+    .choice .badge{ width: 28px; height: 28px; border-radius: 10px; display:grid; place-items:center; font-weight: 950; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); flex: 0 0 auto; }
+    .choice.correct{ border-color: rgba(49,211,154,.35); background: rgba(49,211,154,.10); }
+    .choice.wrong{ border-color: rgba(255,91,106,.35); background: rgba(255,91,106,.10); }
+    .choice.reveal{ border-color: rgba(74,163,255,.35); background: rgba(74,163,255,.10); }
+
+    .feedback{
+      border-radius: 16px;
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(6,11,26,.35);
+      line-height: 1.55;
+      font-size: 13px;
+      display:grid;
+      gap: 8px;
+    }
+    .feedback .row{ display:flex; gap: 10px; align-items:center; flex-wrap:wrap; justify-content:space-between; }
+    .feedback .status{ display:flex; gap: 10px; align-items:center; }
+
+    .badge2{ padding: 3px 10px; border-radius: 999px; font-weight: 950; font-size: 12px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.05); }
+    .badge2.ok{ border-color: rgba(49,211,154,.30); background: rgba(49,211,154,.12); }
+    .badge2.bad{ border-color: rgba(255,91,106,.35); background: rgba(255,91,106,.12); }
+    .badge2.info{ border-color: rgba(74,163,255,.30); background: rgba(74,163,255,.12); }
+
+    .modal-actions{
+      padding: 12px 14px 14px;
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content:flex-end;
+      border-top: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, transparent, rgba(255,255,255,.03));
+    }
+
+    /* ===== Teacher Drawer ===== */
+    .backdrop{
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      pointer-events:none;
+      transition: opacity .18s ease;
+    }
+    .backdrop.show{ opacity: 1; pointer-events:auto; }
+
+    .drawer{
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: min(420px, 96vw);
+      z-index: 90;
+      transform: translateX(105%);
+      transition: transform .18s ease;
+      background: linear-gradient(180deg, rgba(12,27,63,.98), rgba(10,20,51,.96));
+      border-left: 1px solid rgba(255,255,255,.12);
+      box-shadow: -18px 0 45px rgba(0,0,0,.45);
+      display:flex;
+      flex-direction:column;
+    }
+    .drawer.open{ transform: translateX(0); }
+    .drawer header{
+      padding: 14px 14px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      justify-content:space-between;
+    }
+    .drawer header .t{ display:flex; flex-direction:column; gap:2px; }
+    .drawer header strong{ font-weight: 950; letter-spacing:.2px; }
+    .drawer header small{ color: var(--muted); }
+    .drawer .content{ padding: 14px; overflow:auto; display:grid; gap: 12px; }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; animation:none !important; }
+      .btn:hover{ transform:none; }
+      .toast.show{ transform: translateX(-50%); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar" role="banner">
+      <div class="topbar-inner">
+        <div class="brand" aria-label="Game title">
+          <div class="logo" id="brandLogo" aria-hidden="true"></div>
+          <div class="brand-title">
+            <strong id="brandTitle">Flappy n8n</strong>
+            <small id="brandTagline">Bay qua cổng • Sai thì trả lời câu hỏi để hồi sinh</small>
+          </div>
+        </div>
+
+        <div class="stats" aria-label="Game stats">
+          <div class="pill" title="Trạng thái">
+            <span class="dot" id="statusDot" aria-hidden="true"></span>
+            <span class="k">Status</span>
+            <span class="v" id="statusText">Idle</span>
+          </div>
+          <div class="pill" title="Thời gian còn lại">
+            <span aria-hidden="true">⏱️</span>
+            <span class="k">Timer</span>
+            <span class="v" id="timerText">05:00</span>
+          </div>
+          <div class="pill" title="Điểm qua cổng">
+            <span aria-hidden="true">🏁</span>
+            <span class="k">Score</span>
+            <span class="v" id="scoreText">0</span>
+          </div>
+          <div class="pill" title="Số lần hồi sinh (đúng câu hỏi)">
+            <span aria-hidden="true">💙</span>
+            <span class="k">Lives+</span>
+            <span class="v" id="livesText">0</span>
+          </div>
+          <div class="pill" title="Tiến độ câu hỏi">
+            <span aria-hidden="true">🧩</span>
+            <span class="k">Progress</span>
+            <span class="v" id="progressText">0/10</span>
+          </div>
+        </div>
+
+        <div class="actions" aria-label="Actions">
+          <button class="btn ghost" id="btnStartTop" type="button" title="Start / Resume">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 5v14l12-7L8 5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            <span class="txt">Start</span>
+          </button>
+          <button class="btn" id="btnExport" type="button" title="Xuất kết quả dạng ảnh">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M7 14l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 19V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M5 20h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span class="txt">Xuất</span>
+          </button>
+          <button class="btn danger" id="btnReset" type="button" title="Reset game">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M21 12a9 9 0 1 1-3-6.7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M21 3v7h-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="txt">Reset</span>
+          </button>
+          <button class="btn primary" id="btnTeacher" type="button" title="Teacher Mode (phím T) — mật khẩu: n8n">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 2l9 5-9 5-9-5 9-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M3 7v10l9 5 9-5V7" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M12 12v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span class="txt">Teacher</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main role="main">
+      <div class="wrap">
+        <section class="stage" aria-label="Game stage">
+          <div class="canvas-shell">
+            <canvas id="game" width="1280" height="720" role="img" aria-label="Flappy Bird canvas"></canvas>
+
+            <!-- Start overlay (Student Mode) -->
+            <div class="overlay" id="startOverlay">
+              <div class="panel" role="region" aria-label="Student Mode panel">
+                <div class="panel-head">
+                  <div>
+                    <h2>Student Mode</h2>
+                    <p>Chọn bộ câu hỏi, bấm <b>Start</b>. Nhấn <span class="kbd">Space</span> (hoặc chạm) để bay. Mở Teacher Mode ở nút <b>Teacher</b> (góc phải header) hoặc phím <span class="kbd">T</span>.</p>
+                  </div>
+                  <div class="form-row" style="justify-content:flex-end;">
+                    <button class="btn primary" id="btnStart" type="button" aria-label="Start game">
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 5v14l12-7L8 5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+                      <span class="txt">Start</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="grid" aria-label="Setup grid">
+                  <div class="card">
+                    <h3><span aria-hidden="true">⚙️</span> Thiết lập nhanh</h3>
+                    <p class="sub">Va chạm → hiện “câu hỏi cứu mạng”. Trả lời đúng → hồi sinh + thưởng điểm.</p>
+
+                    <div class="form-row">
+                      <label>
+                        Bộ câu hỏi
+                        <select id="selDifficulty" aria-label="Chọn bộ câu hỏi">
+                          <option value="easy">Dễ (10 câu)</option>
+                          <option value="medium">Trung bình (10 câu)</option>
+                          <option value="hard">Khó (10 câu)</option>
+                        </select>
+                      </label>
+                      <label>
+                        Thời gian (phút)
+                        <input id="inpMinutes" type="number" min="1" max="60" step="1" value="5" inputmode="numeric" aria-label="Thời gian phút" />
+                      </label>
+                    </div>
+
+                    <div class="hint" style="margin-top:10px;">
+                      <div aria-hidden="true">🎮</div>
+                      <div>
+                        <div><b>Điều khiển:</b> <span class="kbd">Space</span> flap • <span class="kbd">P</span> pause/resume • <span class="kbd">R</span> reset</div>
+                        <div><b>Teacher:</b> <span class="kbd">T</span> mở Teacher Mode (mật khẩu: <b>n8n</b>)</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card">
+                    <h3><span aria-hidden="true">🧠</span> Demo câu hỏi</h3>
+                    <p class="sub">Bấm để xem câu hỏi ngay (không ảnh hưởng điểm). Dùng để “warm-up” cả lớp.</p>
+                    <div class="form-row">
+                      <button class="btn" id="btnWarmup" type="button" aria-label="Xem thử câu hỏi (demo)">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M9.09 9a3 3 0 1 1 5.82 1c-.48 1.18-1.91 1.65-2.41 2.75-.17.37-.2.8-.2 1.25" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span class="txt">Demo</span>
+                      </button>
+                    </div>
+                    <div class="hint" style="margin-top:10px;">
+                      <div aria-hidden="true">💡</div>
+                      <div>Gợi ý dạy nhanh: cho cả lớp trả lời đồng thanh trước khi chơi (30–60 giây).</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Question Modal -->
+    <div class="modal" id="questionModal" aria-hidden="true">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="qTitle">
+        <div class="modal-head">
+          <div class="modal-title">
+            <strong id="qTitle">Câu hỏi cứu mạng</strong>
+            <span id="qMeta">Set: Dễ • Câu 1/10</span>
+          </div>
+          <button class="btn ghost" id="btnCloseQuestion" type="button" aria-label="Đóng">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span class="txt">Đóng</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="q" id="qText">...</p>
+          <div class="choices" id="qChoices" aria-label="Danh sách lựa chọn"></div>
+
+          <div class="feedback" id="qFeedback" hidden>
+            <div class="row">
+              <div class="status">
+                <span class="badge2 info" id="qBadge">...</span>
+                <span id="qShort">...</span>
+              </div>
+              <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                <button class="btn" id="btnReveal" type="button" aria-label="Reveal đáp án">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                  <span class="txt">Reveal</span>
+                </button>
+              </div>
+            </div>
+            <div id="qHint"></div>
+            <div id="qExplain"></div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn" id="btnContinue" type="button" aria-label="Tiếp tục chơi" hidden>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 5v14l12-7L8 5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            <span class="txt">Tiếp tục</span>
+          </button>
+          <button class="btn danger" id="btnGameOver" type="button" aria-label="Kết thúc" hidden>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span class="txt">Game Over</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal" id="exportModal" aria-hidden="true">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+        <div class="modal-head">
+          <div class="modal-title">
+            <strong id="exportTitle">Xuất kết quả</strong>
+            <span>Ảnh 16:9 (PNG) — có thể tải về hoặc copy (nếu trình duyệt hỗ trợ)</span>
+          </div>
+          <button class="btn ghost" id="btnCloseExport" type="button" aria-label="Đóng">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span class="txt">Đóng</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="card" style="padding:12px;">
+            <p class="sub" style="margin:0 0 10px;">Preview</p>
+            <img id="exportPreview" alt="Kết quả xuất" style="width:100%;height:auto;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.20);" />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn" id="btnCopyImage" type="button">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M9 9h10v10H9V9z" stroke="currentColor" stroke-width="2"/>
+              <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span class="txt">Copy ảnh</span>
+          </button>
+          <a class="btn primary" id="btnDownloadImage" href="#" download="flappy-n8n-result.png" role="button">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 3v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M7 11l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M5 21h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span class="txt">Tải PNG</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Teacher Drawer -->
+    <div class="backdrop" id="drawerBackdrop" aria-hidden="true"></div>
+    <aside class="drawer" id="teacherDrawer" aria-label="Teacher Mode">
+      <header>
+        <div class="t">
+          <strong>Teacher Mode</strong>
+          <small>Mở bằng nút Teacher hoặc phím T • mật khẩu: n8n</small>
+        </div>
+        <button class="btn ghost" id="btnCloseTeacher" type="button" aria-label="Đóng Teacher Mode">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span class="txt">Đóng</span>
+        </button>
+      </header>
+
+      <div class="content">
+        <div class="card" id="teacherLockCard">
+          <h3><span aria-hidden="true">🔒</span> Mở khóa</h3>
+          <p class="sub">Nhập mật khẩu để mở Teacher Mode. Mặc định: <b>n8n</b></p>
+          <div class="form-row">
+            <label style="min-width: 100%;">
+              Password
+              <input id="inpTeacherPass" type="password" placeholder="Nhập mật khẩu..." autocomplete="off" />
+            </label>
+          </div>
+          <div class="form-row">
+            <button class="btn primary" id="btnUnlockTeacher" type="button">Mở khóa</button>
+          </div>
+          <div class="hint">
+            <div aria-hidden="true">🛡️</div>
+            <div>Teacher Mode chỉ lưu trong phiên hiện tại. Reload trang sẽ khóa lại.</div>
+          </div>
+        </div>
+
+        <div class="card" id="teacherPanel" hidden>
+          <h3><span aria-hidden="true">🎛️</span> Điều khiển nhanh</h3>
+          <p class="sub">Chọn set/timer và Start. Bạn cũng có thể mở câu hỏi để “đố nhanh” cả lớp.</p>
+
+          <div class="form-row">
+            <label>
+              Chọn set
+              <select id="selDifficultyTeacher" aria-label="Teacher chọn bộ câu hỏi">
+                <option value="easy">Dễ</option>
+                <option value="medium">Trung bình</option>
+                <option value="hard">Khó</option>
+              </select>
+            </label>
+            <label>
+              Timer (phút)
+              <input id="inpMinutesTeacher" type="number" min="1" max="60" step="1" value="5" inputmode="numeric" aria-label="Teacher chỉnh thời gian" />
+            </label>
+          </div>
+
+          <div class="form-row">
+            <button class="btn primary" id="btnTeacherStart" type="button">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 5v14l12-7L8 5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+              <span class="txt">Start</span>
+            </button>
+            <button class="btn" id="btnTeacherPause" type="button">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6h2v12H9V6zm4 0h2v12h-2V6z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+              <span class="txt">Pause/Resume</span>
+            </button>
+            <button class="btn danger" id="btnTeacherReset" type="button">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M21 12a9 9 0 1 1-3-6.7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M21 3v7h-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span class="txt">Reset</span>
+            </button>
+          </div>
+
+          <div class="card" style="margin-top:12px; background: rgba(255,255,255,.03);">
+            <h3><span aria-hidden="true">🧩</span> Câu hỏi (đố nhanh)</h3>
+            <p class="sub" id="teacherQMeta">Set: Dễ • Con trỏ: 0/10</p>
+            <div class="form-row">
+              <button class="btn" id="btnTeacherOpenQ" type="button">Open</button>
+              <button class="btn" id="btnTeacherNextQ" type="button">Next</button>
+              <button class="btn" id="btnTeacherRevealQ" type="button">Reveal</button>
+            </div>
+          </div>
+
+          <div class="hint">
+            <div aria-hidden="true">⌨️</div>
+            <div><b>Phím tắt:</b> Space = Flap • P = Pause/Resume • R = Reset • T = Teacher</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <canvas id="exportCanvas" width="1200" height="675" hidden></canvas>
+
+    <script>
+      "use strict";
+
+      /** =========================
+       *  CONFIG — giáo viên sửa nhanh
+       *  ========================= */
+      const CONFIG = {
+        text: {
+          brand: "Flappy n8n",
+          tagline: "Sử dụng n8n cơ bản • Flappy Bird + Quiz cứu mạng",
+        },
+        assets: {
+          logoSvg:
+            `<svg viewBox="0 0 48 48" width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M24 4c9.94 0 18 8.06 18 18S33.94 40 24 40 6 31.94 6 22 14.06 4 24 4Z" stroke="rgba(234,240,255,.92)" stroke-width="2"/>
+              <path d="M14 25c3.5-7 7-10 12-10s8.5 3 12 10" stroke="rgba(74,163,255,.95)" stroke-width="2" stroke-linecap="round"/>
+              <path d="M16 31c3.2-3.2 6.2-4.8 8.8-4.8 3.3 0 6.3 1.9 9.2 5.8" stroke="rgba(49,211,154,.92)" stroke-width="2" stroke-linecap="round"/>
+              <path d="M26 22c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2Z" fill="rgba(234,240,255,.92)"/>
+            </svg>`,
+        },
+        teacher: { password: "n8n" },
+        session: { defaultMinutes: 5 },
+        game: {
+          width: 1280,
+          height: 720,
+          gravity: 2400,
+          flapVelocity: -680,
+          maxFallVelocity: 1200,
+          pipeSpeed: 440,
+          pipeWidth: 110,
+          pipeGap: 220,
+          pipeSpawnEveryMs: 1350,
+          pipeMinTop: 90,
+          pipeMinBottom: 120,
+          birdRadius: 22,
+          birdX: 0.33,
+          birdStartY: 0.50,
+          tiltMax: 0.65,
+          scorePerGate: 1,
+          bonusCorrect: 5,
+          parallaxSpeed: 0.22,
+        },
+        questionSets: {
+          easy: [
+            { question: "Trong n8n, “Workflow” dùng để làm gì?", options: ["Lưu mật khẩu đăng nhập", "Chuỗi node tự động hóa các bước", "Tạo email marketing", "Chỉ để vẽ sơ đồ"], answerIndex: 1, hint: "Workflow = quy trình (flow) gồm nhiều node.", explanation: "Workflow là nơi bạn nối các node thành một quy trình xử lý tự động (trigger → xử lý → output)." },
+            { question: "Node nào thường dùng để bắt đầu theo lịch (schedule)?", options: ["Cron", "HTTP Request", "Merge", "Set"], answerIndex: 0, hint: "Chạy theo giờ/ngày/tuần.", explanation: "Cron Trigger dùng để kích hoạt workflow theo lịch định kỳ." },
+            { question: "Node “Set” thường dùng để làm gì?", options: ["Gọi API", "Tạo/biến đổi dữ liệu thủ công (fields)", "Ghép 2 luồng dữ liệu", "Chặn workflow"], answerIndex: 1, hint: "Tạo field mới / sửa field.", explanation: "Set node giúp tạo/sửa/xóa fields trong item dữ liệu (nhanh, trực quan)." },
+            { question: "Trong n8n, “Node” là gì?", options: ["Một bước xử lý trong workflow", "Một bảng dữ liệu", "Một trang web", "Một loại tài khoản"], answerIndex: 0, hint: "Workflow gồm nhiều ...", explanation: "Node là một bước (step) thực hiện một hành động/logic trong workflow." },
+            { question: "Muốn gọi API lấy dữ liệu từ Internet, thường dùng node nào?", options: ["HTTP Request", "Cron", "IF", "Wait"], answerIndex: 0, hint: "Tên node đã nói rõ.", explanation: "HTTP Request node dùng để gọi REST API (GET/POST/PUT/DELETE...)." },
+            { question: "“Trigger” trong n8n có vai trò gì?", options: ["Kết thúc workflow", "Kích hoạt workflow bắt đầu chạy", "Chỉ để trang trí", "Chỉ dùng khi test"], answerIndex: 1, hint: "Trigger = cò súng.", explanation: "Trigger là điểm bắt đầu chạy workflow khi có sự kiện (cron/webhook/manual...)." },
+            { question: "Node “IF” dùng để làm gì?", options: ["So sánh điều kiện để rẽ nhánh", "Gọi API", "Gộp dữ liệu", "Lưu file ảnh"], answerIndex: 0, hint: "IF = nếu… thì…", explanation: "IF node kiểm tra điều kiện và chia luồng True/False." },
+            { question: "Khi test workflow thủ công trong n8n, thường dùng cách nào?", options: ["Manual Trigger", "Cron", "Webhook (Production)", "Merge"], answerIndex: 0, hint: "Chạy bằng tay.", explanation: "Manual Trigger/Execute workflow giúp chạy thử nhanh khi xây dựng." },
+            { question: "“Credentials” trong n8n dùng để làm gì?", options: ["Lưu thông tin kết nối (API key/OAuth) an toàn", "Tăng tốc độ mạng", "Chuyển đổi dữ liệu", "Tạo UI đẹp hơn"], answerIndex: 0, hint: "Liên quan login/API key.", explanation: "Credentials là nơi lưu thông tin xác thực để các node kết nối dịch vụ bên ngoài." },
+            { question: "Muốn “tạm dừng” workflow một lúc rồi chạy tiếp, dùng node nào?", options: ["Wait", "Set", "Merge", "Cron"], answerIndex: 0, hint: "Chờ...", explanation: "Wait node cho phép delay theo thời gian hoặc chờ tới một mốc thời gian." },
+          ],
+          medium: [
+            { question: "Webhook Trigger trong n8n phù hợp nhất cho tình huống nào?", options: ["Chạy theo lịch", "Nhận request từ hệ thống khác để kích hoạt", "Gộp dữ liệu 2 nhánh", "Định dạng JSON"], answerIndex: 1, hint: "Có request gửi tới URL.", explanation: "Webhook Trigger tạo endpoint để nhận request (POST/GET) và bắt đầu workflow." },
+            { question: "Trong n8n, “Expression” thường dùng để làm gì?", options: ["Chạy workflow nhanh hơn", "Chèn dữ liệu động vào field (ví dụ: {{$json.name}})", "Tạo credential", "Mở rộng RAM"], answerIndex: 1, hint: "Dấu {{ }}.", explanation: "Expression giúp tham chiếu dữ liệu từ node trước và tạo giá trị động." },
+            { question: "Node “Merge” thường dùng để làm gì?", options: ["Rẽ nhánh điều kiện", "Gộp dữ liệu từ nhiều nhánh/nguồn", "Gọi API", "Tạo thời gian trễ"], answerIndex: 1, hint: "Merge = gộp.", explanation: "Merge dùng để kết hợp dữ liệu giữa 2 luồng (append, merge by key, ...)." },
+            { question: "Sau khi chạy workflow, kết quả từng bước thường xem ở đâu?", options: ["Trong Execution (Lịch sử chạy)", "Chỉ ở email", "Chỉ ở database", "Không xem được"], answerIndex: 0, hint: "Chỗ lưu lịch sử chạy.", explanation: "Execution logs hiển thị input/output từng node và giúp debug." },
+            { question: "Khi một node trả về nhiều items, n8n sẽ xử lý như thế nào mặc định?", options: ["Chỉ lấy item đầu", "Lặp node theo từng item (item-based)", "Bỏ qua tất cả", "Tự gộp thành 1 item"], answerIndex: 1, hint: "n8n theo từng item.", explanation: "n8n thường chạy theo items: mỗi item là một bản ghi được xử lý." },
+            { question: "Muốn lấy dữ liệu từ node trước, tham chiếu đúng thường là?", options: ["$http.data", "{{$json.fieldName}}", "{{$env.DATA}}", "{{$node.id}}"], answerIndex: 1, hint: "$json là dữ liệu item hiện tại.", explanation: "{{$json.field}} là cách phổ biến để lấy field ở item hiện tại." },
+            { question: "Điều gì nên làm để giảm lỗi khi gọi API trong HTTP Request?", options: ["Không dùng credentials", "Thêm retry/handle lỗi, kiểm tra status code", "Luôn dùng GET", "Tắt SSL"], answerIndex: 1, hint: "Xử lý lỗi + retry.", explanation: "Thiết lập retry/timeout và xử lý status code giúp workflow bền vững hơn." },
+            { question: "Node nào phù hợp để xử lý điều kiện “nếu field rỗng thì set default” mà không viết code?", options: ["Set + Expression", "Webhook", "Cron", "Wait"], answerIndex: 0, hint: "Set kết hợp expression.", explanation: "Set node + expression có thể gán giá trị mặc định khi field thiếu/rỗng." },
+            { question: "Khi cần debug dữ liệu đi qua từng node, cách nhanh nhất là?", options: ["Xóa workflow", "Xem output node trong execution / pin data", "Restart máy", "Chuyển sang tool khác"], answerIndex: 1, hint: "Xem output từng node.", explanation: "Xem dữ liệu output trong execution và dùng pin data giúp debug nhanh." },
+            { question: "Node “Function/Code” dùng khi nào là hợp lý?", options: ["Mọi lúc", "Khi cần logic phức tạp mà node có sẵn khó làm", "Chỉ để gọi API", "Chỉ để mở UI"], answerIndex: 1, hint: "Khi cần custom logic.", explanation: "Ưu tiên node built-in; dùng code khi cần xử lý nâng cao." },
+          ],
+          hard: [
+            { question: "Trong n8n, “Continue On Fail” có ích nhất khi nào?", options: ["Muốn workflow dừng ngay khi lỗi", "Muốn node lỗi nhưng workflow vẫn chạy tiếp", "Muốn tăng tốc CPU", "Muốn đổi UI theme"], answerIndex: 1, hint: "Không dừng workflow vì 1 lỗi.", explanation: "Continue On Fail giúp workflow không bị dừng toàn bộ nếu một node gặp lỗi." },
+            { question: "Bạn muốn chỉ chạy nhánh True của IF và bỏ nhánh False, làm cách nào đúng?", options: ["Xóa nhánh False hoặc không nối node sau False", "Bắt buộc nối cả 2 nhánh", "Chỉ đổi màu node", "Không thể"], answerIndex: 0, hint: "Nhánh không nối thì không chạy.", explanation: "Nhánh nào không có node phía sau thì không thực thi thêm." },
+            { question: "Khi muốn gộp dữ liệu 2 nhánh theo một khóa (id/email), nên dùng kiểu merge nào?", options: ["Append", "Merge By Key / Combine", "Pass-through", "Wait"], answerIndex: 1, hint: "Theo khóa chung.", explanation: "Merge by key (combine) giúp match item theo một field khóa." },
+            { question: "Nếu workflow xử lý nhiều items và bạn muốn giảm số lần gọi API, chiến lược hợp lý là?", options: ["Gọi API từng item", "Batch/aggregate trước, rồi gọi ít lần", "Tăng số node", "Tắt logs"], answerIndex: 1, hint: "Gộp trước khi gọi.", explanation: "Batch hóa giúp giảm số request, giảm rate-limit." },
+            { question: "Trong Expression, toán tử 3 ngôi (ternary) dùng để làm gì?", options: ["Tạo array", "Viết điều kiện ngắn gọn: condition ? A : B", "Đổi timezone", "Gọi HTTP"], answerIndex: 1, hint: "condition ? ... : ...", explanation: "Ternary giúp đặt logic if-else nhanh trong một expression." },
+            { question: "Bạn muốn lấy dữ liệu output từ một node cụ thể, cách tham chiếu phổ biến là?", options: ["{{$node['Tên Node'].json.field}}", "{{$json.node.field}}", "{{$workflow.field}}", "{{$cred.field}}"], answerIndex: 0, hint: "Tham chiếu theo tên node.", explanation: "Tham chiếu dữ liệu theo node: {{$node['NodeName'].json.field}}." },
+            { question: "Khi dùng Webhook Trigger, môi trường Test vs Production thường khác nhau ở điểm nào?", options: ["Không khác", "URL endpoint và hành vi listen", "Chỉ khác màu", "Chỉ khác ngôn ngữ"], answerIndex: 1, hint: "Test URL & Prod URL.", explanation: "Webhook thường có test URL (khi listen) và production URL." },
+            { question: "Muốn tránh lộ API key trong workflow, cách làm đúng là?", options: ["Hardcode API key", "Lưu API key trong Credentials/ENV và tham chiếu", "Gửi key qua chat", "Dán vào ghi chú"], answerIndex: 1, hint: "Credentials là nơi dành cho key.", explanation: "Lưu key ở Credentials hoặc biến môi trường, không hardcode." },
+            { question: "Nếu một node cần retry khi lỗi 429 (rate limit), cách tiếp cận hợp lý là?", options: ["Spam liên tục", "Delay/backoff + retry có giới hạn", "Tắt HTTPS", "Đổi endpoint ngẫu nhiên"], answerIndex: 1, hint: "Backoff.", explanation: "Backoff + retry giới hạn giúp tuân thủ rate limit." },
+            { question: "Muốn lưu log có cấu trúc để audit, nên làm gì?", options: ["Chỉ xem màn hình", "Ghi log ra DB/Sheet/Storage có schema + lưu execution id", "Xóa execution", "Tắt execution history"], answerIndex: 1, hint: "Lưu log có trường và id.", explanation: "Ghi log có cấu trúc giúp audit/tra cứu theo execution id." },
+          ]
+        }
+      };
+
+      /** =========================
+       *  DOM helpers
+       *  ========================= */
+      const $ = (sel, root=document) => root.querySelector(sel);
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const pad2 = (n) => String(n).padStart(2, "0");
+      const fmtTime = (sec) => {
+        sec = Math.max(0, Math.floor(sec));
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        return `${pad2(m)}:${pad2(s)}`;
+      };
+
+      /** =========================
+       *  DOM refs
+       *  ========================= */
+      const brandLogo = $("#brandLogo");
+      const brandTitle = $("#brandTitle");
+      const brandTagline = $("#brandTagline");
+
+      const canvas = $("#game");
+      const ctx = canvas.getContext("2d", { alpha: true, desynchronized: true });
+
+      const startOverlay = $("#startOverlay");
+      const btnStart = $("#btnStart");
+      const btnStartTop = $("#btnStartTop");
+      const btnReset = $("#btnReset");
+      const btnExport = $("#btnExport");
+      const btnTeacher = $("#btnTeacher");
+
+      const selDifficulty = $("#selDifficulty");
+      const inpMinutes = $("#inpMinutes");
+      const btnWarmup = $("#btnWarmup");
+
+      const statusDot = $("#statusDot");
+      const statusText = $("#statusText");
+      const timerText = $("#timerText");
+      const scoreText = $("#scoreText");
+      const livesText = $("#livesText");
+      const progressText = $("#progressText");
+
+      const toast = $("#toast");
+
+      // Question modal
+      const questionModal = $("#questionModal");
+      const btnCloseQuestion = $("#btnCloseQuestion");
+      const qTitle = $("#qTitle");
+      const qMeta = $("#qMeta");
+      const qText = $("#qText");
+      const qChoices = $("#qChoices");
+      const qFeedback = $("#qFeedback");
+      const qBadge = $("#qBadge");
+      const qShort = $("#qShort");
+      const qHint = $("#qHint");
+      const qExplain = $("#qExplain");
+      const btnReveal = $("#btnReveal");
+      const btnContinue = $("#btnContinue");
+      const btnGameOver = $("#btnGameOver");
+
+      // Export modal
+      const exportModal = $("#exportModal");
+      const btnCloseExport = $("#btnCloseExport");
+      const exportPreview = $("#exportPreview");
+      const btnDownloadImage = $("#btnDownloadImage");
+      const btnCopyImage = $("#btnCopyImage");
+      const exportCanvas = $("#exportCanvas");
+      const exportCtx = exportCanvas.getContext("2d");
+
+      // Teacher
+      const teacherDrawer = $("#teacherDrawer");
+      const drawerBackdrop = $("#drawerBackdrop");
+      const btnCloseTeacher = $("#btnCloseTeacher");
+      const teacherLockCard = $("#teacherLockCard");
+      const inpTeacherPass = $("#inpTeacherPass");
+      const btnUnlockTeacher = $("#btnUnlockTeacher");
+      const teacherPanel = $("#teacherPanel");
+      const selDifficultyTeacher = $("#selDifficultyTeacher");
+      const inpMinutesTeacher = $("#inpMinutesTeacher");
+      const btnTeacherStart = $("#btnTeacherStart");
+      const btnTeacherPause = $("#btnTeacherPause");
+      const btnTeacherReset = $("#btnTeacherReset");
+      const btnTeacherOpenQ = $("#btnTeacherOpenQ");
+      const btnTeacherNextQ = $("#btnTeacherNextQ");
+      const btnTeacherRevealQ = $("#btnTeacherRevealQ");
+      const teacherQMeta = $("#teacherQMeta");
+
+      /** =========================
+       *  Toast / modal / drawer
+       *  ========================= */
+      let toastT = 0;
+      function showToast(message, tagText = "INFO", kind = "info"){
+        toast.innerHTML = "";
+        const tag = document.createElement("span");
+        tag.className = "tag " + (kind === "ok" ? "ok" : kind === "bad" ? "bad" : "");
+        tag.textContent = tagText;
+        const msg = document.createElement("span");
+        msg.textContent = message;
+        toast.append(tag, msg);
+        toast.classList.add("show");
+        clearTimeout(toastT);
+        toastT = window.setTimeout(() => toast.classList.remove("show"), 2200);
+      }
+
+      function openModal(modalEl){
+        modalEl.classList.add("open");
+        modalEl.setAttribute("aria-hidden", "false");
+      }
+      function closeModal(modalEl){
+        modalEl.classList.remove("open");
+        modalEl.setAttribute("aria-hidden", "true");
+      }
+
+      function openDrawer(){
+        teacherDrawer.classList.add("open");
+        drawerBackdrop.classList.add("show");
+        drawerBackdrop.setAttribute("aria-hidden", "false");
+      }
+      function closeDrawer(){
+        teacherDrawer.classList.remove("open");
+        drawerBackdrop.classList.remove("show");
+        drawerBackdrop.setAttribute("aria-hidden", "true");
+      }
+
+      /** =========================
+       *  Status
+       *  ========================= */
+      function setStatus(kind, text){
+        statusText.textContent = text;
+        statusDot.classList.remove("live","pause","over");
+        if (kind) statusDot.classList.add(kind);
+      }
+
+      function labelDifficulty(diff){
+        if (diff === "easy") return "Dễ";
+        if (diff === "medium") return "Trung bình";
+        if (diff === "hard") return "Khó";
+        return diff;
+      }
+
+      /** =========================
+       *  Game state
+       *  ========================= */
+      const GAME = {
+        state: "idle", // idle | running | paused | question | over | finished
+        difficulty: "easy",
+        questions: [],
+        qIndex: 0,
+        answered: 0,
+        livesPlus: 0,
+        score: 0,
+        timeTotal: 300,
+        timeLeft: 300,
+        lastTick: 0,
+        accSpawn: 0,
+        accParallax: 0,
+        rngSeed: 1234567,
+        pendingDeath: false,
+        lastQuestionWasWarmup: false,
+        revealRequested: false,
+        teacherUnlocked: false,
+
+        bird: { x: 0, y: 0, vy: 0, rot: 0 },
+        pipes: [],
+        pipeId: 0,
+        scale: 1,
+      };
+
+      const now = () => performance.now();
+
+      function rand01(){
+        let x = GAME.rngSeed | 0;
+        x ^= x << 13; x ^= x >>> 17; x ^= x << 5;
+        GAME.rngSeed = x;
+        return ((x >>> 0) / 4294967296);
+      }
+
+      function pickSet(diff){
+        const set = CONFIG.questionSets[diff] || CONFIG.questionSets.easy;
+        return set.map(q => ({
+          question: q.question,
+          options: [...q.options],
+          answerIndex: q.answerIndex,
+          hint: q.hint || "",
+          explanation: q.explanation || "",
+        }));
+      }
+
+      function applyDifficulty(diff){
+        GAME.difficulty = diff;
+        GAME.questions = pickSet(diff);
+        GAME.qIndex = 0;
+        GAME.answered = 0;
+        updateProgress();
+        updateTeacherMeta();
+      }
+
+      function applyMinutes(minutes){
+        const m = clamp(Number(minutes || 5), 1, 60);
+        GAME.timeTotal = m * 60;
+        GAME.timeLeft = m * 60;
+        timerText.textContent = fmtTime(GAME.timeLeft);
+      }
+
+      function updateProgress(){
+        const total = GAME.questions.length || 0;
+        progressText.textContent = `${Math.min(GAME.answered, total)}/${total}`;
+      }
+
+      function updateHUD(){
+        scoreText.textContent = String(GAME.score);
+        livesText.textContent = String(GAME.livesPlus);
+        timerText.textContent = fmtTime(GAME.timeLeft);
+        updateProgress();
+      }
+
+      function updateTeacherMeta(){
+        const total = GAME.questions.length || 0;
+        teacherQMeta.textContent = `Set: ${labelDifficulty(GAME.difficulty)} • Con trỏ: ${GAME.qIndex}/${total}`;
+      }
+
+      function setState(next){
+        GAME.state = next;
+        if (next === "idle") setStatus("", "Idle");
+        else if (next === "running") setStatus("live", "Running");
+        else if (next === "paused") setStatus("pause", "Paused");
+        else if (next === "question") setStatus("pause", "Question");
+        else if (next === "over") setStatus("over", "Game Over");
+        else if (next === "finished") setStatus("over", "Time Up");
+      }
+
+      /** =========================
+       *  Canvas scale
+       *  ========================= */
+      function resizeCanvas(){
+        const rect = canvas.getBoundingClientRect();
+        const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        canvas.width = Math.round(rect.width * dpr);
+        canvas.height = Math.round(rect.height * dpr);
+        const sx = canvas.width / CONFIG.game.width;
+        const sy = canvas.height / CONFIG.game.height;
+        GAME.scale = Math.min(sx, sy);
+      }
+
+      /** =========================
+       *  Reset / Start
+       *  ========================= */
+      function hardReset(){
+        const w = CONFIG.game.width;
+        const h = CONFIG.game.height;
+
+        GAME.pipes = [];
+        GAME.pipeId = 0;
+        GAME.score = 0;
+        GAME.livesPlus = 0;
+        GAME.pendingDeath = false;
+        GAME.revealRequested = false;
+
+        GAME.bird.x = w * CONFIG.game.birdX;
+        GAME.bird.y = h * CONFIG.game.birdStartY;
+        GAME.bird.vy = 0;
+        GAME.bird.rot = 0;
+
+        GAME.accSpawn = 0;
+        GAME.accParallax = 0;
+        GAME.rngSeed = (Date.now() & 0xffffffff) ^ 0xA5A5A5A5;
+
+        updateHUD();
+        drawFrame(0);
+      }
+
+      function startFromUI(){
+        // Always apply UI first
+        const diff = selDifficulty.value;
+        const mins = inpMinutes.value;
+        applyDifficulty(diff);
+        applyMinutes(mins);
+        if (GAME.teacherUnlocked){
+          selDifficultyTeacher.value = diff;
+          inpMinutesTeacher.value = String(Math.round(GAME.timeTotal/60));
+          updateTeacherMeta();
+        }
+        hardReset();
+        startGame();
+      }
+
+      function startGame(){
+        if (GAME.state === "running") return;
+        startOverlay.hidden = true;
+        setState("running");
+        GAME.lastTick = now();
+        showToast("Bắt đầu! Space/chạm để bay.", "GO", "ok");
+        requestAnimationFrame(loop);
+      }
+
+      function pauseToggle(){
+        if (GAME.state === "running"){
+          setState("paused");
+          showToast("Đã tạm dừng. Nhấn P để tiếp tục.", "PAUSE", "info");
+        } else if (GAME.state === "paused"){
+          setState("running");
+          GAME.lastTick = now();
+          showToast("Tiếp tục!", "PLAY", "ok");
+          requestAnimationFrame(loop);
+        }
+      }
+
+      function endGame(kind){
+        if (GAME.state === "over" || GAME.state === "finished") return;
+        if (kind === "timeup"){
+          setState("finished");
+          showToast("Hết giờ! Có thể xuất kết quả.", "TIME", "info");
+        } else {
+          setState("over");
+          showToast("Game Over. Reset để chơi lại hoặc xuất kết quả.", "OVER", "bad");
+        }
+        startOverlay.hidden = false;
+      }
+
+      function resetAll(){
+        setState("idle");
+        closeModal(questionModal);
+        closeModal(exportModal);
+        startOverlay.hidden = false;
+        // apply current UI values, but do not auto-start
+        applyDifficulty(selDifficulty.value);
+        applyMinutes(inpMinutes.value);
+        hardReset();
+        showToast("Đã reset. Bấm Start để chơi.", "RESET", "info");
+      }
+
+      /** =========================
+       *  Gameplay
+       *  ========================= */
+      function flap(){
+        if (GAME.state === "idle") return startFromUI();
+        if (GAME.state !== "running") return;
+        GAME.bird.vy = CONFIG.game.flapVelocity;
+      }
+
+      function spawnPipe(){
+        const g = CONFIG.game;
+        const h = g.height;
+        const gap = g.pipeGap;
+        const minTop = g.pipeMinTop;
+        const minBottom = g.pipeMinBottom;
+        const available = h - minTop - minBottom - gap;
+        const topH = minTop + Math.floor(rand01() * Math.max(1, available));
+
+        GAME.pipes.push({
+          id: ++GAME.pipeId,
+          x: g.width + 40,
+          topH,
+          gapH: gap,
+          passed: false,
+        });
+      }
+
+      function rectCircleCollide(rx, ry, rw, rh, cx, cy, cr){
+        const closestX = clamp(cx, rx, rx + rw);
+        const closestY = clamp(cy, ry, ry + rh);
+        const dx = cx - closestX;
+        const dy = cy - closestY;
+        return (dx*dx + dy*dy) <= cr*cr;
+      }
+
+      function checkCollisions(){
+        const g = CONFIG.game;
+        const h = g.height;
+        const b = GAME.bird;
+        const r = g.birdRadius;
+
+        if (b.y - r < 0) return "ceiling";
+        if (b.y + r > h) return "ground";
+
+        for (const p of GAME.pipes){
+          const px = p.x;
+          const pw = g.pipeWidth;
+          const topH = p.topH;
+          const gapH = p.gapH;
+
+          if (rectCircleCollide(px, 0, pw, topH, b.x, b.y, r)) return "pipe";
+          const by = topH + gapH;
+          const bh = h - by;
+          if (rectCircleCollide(px, by, pw, bh, b.x, b.y, r)) return "pipe";
+
+          if (!p.passed && (b.x > px + pw)){
+            p.passed = true;
+            GAME.score += g.scorePerGate;
+          }
+        }
+        return "";
+      }
+
+      function getNextQuestion(){
+        if (GAME.qIndex >= GAME.questions.length) return null;
+        return GAME.questions[GAME.qIndex];
+      }
+
+      function consumeQuestion(){
+        GAME.qIndex += 1;
+        GAME.answered += 1;
+        updateHUD();
+        updateTeacherMeta();
+      }
+
+      function reviveAfterCorrect(){
+        const w = CONFIG.game.width;
+        const h = CONFIG.game.height;
+
+        GAME.bird.x = w * CONFIG.game.birdX;
+        GAME.bird.y = h * CONFIG.game.birdStartY;
+        GAME.bird.vy = 0;
+        GAME.bird.rot = 0;
+
+        GAME.pipes = [];
+        GAME.accSpawn = 0;
+        GAME.pendingDeath = false;
+
+        GAME.livesPlus += 1;
+        GAME.score += CONFIG.game.bonusCorrect;
+        updateHUD();
+      }
+
+      function handleDeath(){
+        if (GAME.state !== "running") return;
+        GAME.pendingDeath = true;
+        setState("question");
+
+        const q = getNextQuestion();
+        if (!q){
+          endGame("over");
+          return;
+        }
+        openQuestionModal(q, { isWarmup:false });
+      }
+
+      /** =========================
+       *  Question UI
+       *  ========================= */
+      function clearFeedback(){
+        qFeedback.hidden = true;
+        qHint.textContent = "";
+        qExplain.textContent = "";
+        btnContinue.hidden = true;
+        btnGameOver.hidden = true;
+        qChoices.querySelectorAll(".choice").forEach(el => {
+          el.classList.remove("correct","wrong","reveal");
+          el.disabled = false;
+        });
+        GAME.revealRequested = false;
+      }
+
+      function buildChoices(q){
+        qChoices.innerHTML = "";
+        const letters = ["A","B","C","D","E","F"];
+        q.options.forEach((opt, idx) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "choice";
+          btn.setAttribute("data-idx", String(idx));
+          btn.setAttribute("aria-label", `Chọn đáp án ${letters[idx]}`);
+
+          const badge = document.createElement("span");
+          badge.className = "badge";
+          badge.textContent = letters[idx];
+
+          const text = document.createElement("span");
+          text.textContent = opt;
+
+          btn.append(badge, text);
+          qChoices.appendChild(btn);
+        });
+      }
+
+      function setFeedback({ kind="info", title="", hint="", explain="" }){
+        qFeedback.hidden = false;
+        qBadge.className = "badge2 " + (kind === "ok" ? "ok" : kind === "bad" ? "bad" : "info");
+        qBadge.textContent = kind === "ok" ? "ĐÚNG" : kind === "bad" ? "SAI" : "GỢI Ý";
+        qShort.textContent = title;
+        qHint.textContent = hint ? `Hint: ${hint}` : "";
+        qExplain.textContent = explain ? `Explanation: ${explain}` : "";
+      }
+
+      function highlightCorrect(q){
+        qChoices.querySelectorAll(".choice").forEach(el => {
+          const idx = Number(el.getAttribute("data-idx"));
+          if (idx === q.answerIndex) el.classList.add("reveal");
+        });
+      }
+
+      function openQuestionModal(q, { isWarmup=false } = {}){
+        GAME.lastQuestionWasWarmup = !!isWarmup;
+        qTitle.textContent = isWarmup ? "Demo câu hỏi" : "Câu hỏi cứu mạng";
+        qMeta.textContent = `Set: ${labelDifficulty(GAME.difficulty)} • Câu ${Math.min(GAME.qIndex+1, GAME.questions.length)}/${GAME.questions.length}`;
+        qText.textContent = q.question;
+
+        clearFeedback();
+        buildChoices(q);
+        openModal(questionModal);
+
+        const first = qChoices.querySelector(".choice");
+        if (first) first.focus({ preventScroll:true });
+
+        if (GAME.revealRequested){
+          highlightCorrect(q);
+          setFeedback({ kind:"info", title:"Teacher Reveal", hint:q.hint, explain:q.explanation });
+        }
+      }
+
+      function closeQuestionModal(){
+        closeModal(questionModal);
+      }
+
+      function onAnswerSelected(idx){
+        const q = getNextQuestion();
+        if (!q) return;
+
+        qChoices.querySelectorAll(".choice").forEach(el => el.disabled = true);
+
+        const correct = (idx === q.answerIndex);
+
+        qChoices.querySelectorAll(".choice").forEach(el => {
+          const i = Number(el.getAttribute("data-idx"));
+          if (i === q.answerIndex) el.classList.add("correct");
+          if (i === idx && !correct) el.classList.add("wrong");
+        });
+
+        consumeQuestion();
+
+        if (correct){
+          setFeedback({ kind:"ok", title:"Chuẩn! Hồi sinh + thưởng điểm.", hint:q.hint, explain:q.explanation });
+          btnContinue.hidden = false;
+          btnGameOver.hidden = true;
+          showToast("Trả lời đúng! Hồi sinh +5 điểm.", "OK", "ok");
+        } else {
+          setFeedback({ kind:"bad", title:"Sai rồi — kết thúc lượt chơi.", hint:q.hint, explain:q.explanation });
+          btnContinue.hidden = true;
+          btnGameOver.hidden = false;
+          showToast("Trả lời sai. Game Over.", "NO", "bad");
+        }
+      }
+
+      /** =========================
+       *  Render
+       *  ========================= */
+      function roundRect(x, y, w, h, r, fill, stroke){
+        const rr = Math.min(r, w/2, h/2);
+        ctx.beginPath();
+        ctx.moveTo(x+rr, y);
+        ctx.arcTo(x+w, y, x+w, y+h, rr);
+        ctx.arcTo(x+w, y+h, x, y+h, rr);
+        ctx.arcTo(x, y+h, x, y, rr);
+        ctx.arcTo(x, y, x+w, y, rr);
+        ctx.closePath();
+        if (fill) ctx.fill();
+        if (stroke) ctx.stroke();
+      }
+
+      function drawBackground(t){
+        const w = CONFIG.game.width;
+        const h = CONFIG.game.height;
+        const g = ctx.createLinearGradient(0, 0, 0, h);
+        g.addColorStop(0, "rgba(74,163,255,.20)");
+        g.addColorStop(0.55, "rgba(43,109,255,.10)");
+        g.addColorStop(1, "rgba(6,11,26,.25)");
+        ctx.fillStyle = g;
+        ctx.fillRect(0,0,w,h);
+
+        const sp = CONFIG.game.parallaxSpeed;
+        GAME.accParallax += (t * 0.00002 * sp);
+        const off = (GAME.accParallax % 1);
+
+        ctx.globalAlpha = 0.6;
+        for (let i=0;i<90;i++){
+          const x = (i*137.2 + off*w*0.6) % w;
+          const y = (i*61.8 + off*h*0.35) % h;
+          const r = (i%5===0? 2.2 : 1.4);
+          ctx.fillStyle = "rgba(234,240,255,.18)";
+          ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "rgba(255,255,255,.05)";
+        ctx.fillRect(0, h-90, w, 2);
+      }
+
+      function drawPipes(){
+        const g = CONFIG.game;
+        const h = g.height;
+
+        for (const p of GAME.pipes){
+          const x = p.x;
+          const pw = g.pipeWidth;
+          const topH = p.topH;
+          const gapH = p.gapH;
+          const bottomY = topH + gapH;
+
+          const grad = ctx.createLinearGradient(x, 0, x+pw, 0);
+          grad.addColorStop(0, "rgba(74,163,255,.18)");
+          grad.addColorStop(0.5, "rgba(49,211,154,.10)");
+          grad.addColorStop(1, "rgba(74,163,255,.14)");
+
+          ctx.fillStyle = grad;
+          ctx.strokeStyle = "rgba(255,255,255,.10)";
+          ctx.lineWidth = 2;
+
+          roundRect(x, 0, pw, topH, 18, true, true);
+          roundRect(x, bottomY, pw, h-bottomY, 18, true, true);
+
+          ctx.fillStyle = "rgba(255,255,255,.06)";
+          ctx.fillRect(x-6, topH-22, pw+12, 20);
+          ctx.fillRect(x-6, bottomY, pw+12, 20);
+        }
+      }
+
+      function drawBird(){
+        const b = GAME.bird;
+        const r = CONFIG.game.birdRadius;
+
+        const vy = clamp(b.vy, -900, 1200);
+        const rot = clamp(vy / 1200, -1, 1) * CONFIG.game.tiltMax;
+        b.rot = rot;
+
+        ctx.save();
+        ctx.translate(b.x, b.y);
+        ctx.rotate(rot);
+
+        const bodyGrad = ctx.createLinearGradient(-r, -r, r, r);
+        bodyGrad.addColorStop(0, "rgba(74,163,255,.92)");
+        bodyGrad.addColorStop(1, "rgba(43,109,255,.65)");
+        ctx.fillStyle = bodyGrad;
+        ctx.strokeStyle = "rgba(255,255,255,.14)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0,0,r,0,Math.PI*2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "rgba(234,240,255,.14)";
+        ctx.beginPath();
+        ctx.ellipse(-6, 6, r*0.55, r*0.35, -0.3, 0, Math.PI*2);
+        ctx.fill();
+
+        ctx.fillStyle = "rgba(234,240,255,.92)";
+        ctx.beginPath();
+        ctx.arc(8,-6,6,0,Math.PI*2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(6,11,26,.85)";
+        ctx.beginPath();
+        ctx.arc(9,-6,2.4,0,Math.PI*2);
+        ctx.fill();
+
+        ctx.fillStyle = "rgba(255,204,102,.95)";
+        ctx.strokeStyle = "rgba(255,255,255,.10)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(r-2, 0);
+        ctx.lineTo(r+14, 5);
+        ctx.lineTo(r+14, -5);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      function drawHUDOverlay(){
+        const w = CONFIG.game.width;
+        const h = CONFIG.game.height;
+        const vg = ctx.createRadialGradient(w*0.5,h*0.45, 200, w*0.5,h*0.45, 900);
+        vg.addColorStop(0, "rgba(0,0,0,0)");
+        vg.addColorStop(1, "rgba(0,0,0,.35)");
+        ctx.fillStyle = vg;
+        ctx.fillRect(0,0,w,h);
+      }
+
+      function drawFrame(t){
+        ctx.setTransform(GAME.scale, 0, 0, GAME.scale, 0, 0);
+        ctx.clearRect(0,0, CONFIG.game.width, CONFIG.game.height);
+        drawBackground(t);
+        drawPipes();
+        drawBird();
+        drawHUDOverlay();
+      }
+
+      /** =========================
+       *  Loop
+       *  ========================= */
+      function loop(t){
+        if (GAME.state !== "running") return;
+
+        const dt = clamp((t - GAME.lastTick) / 1000, 0, 0.033);
+        GAME.lastTick = t;
+
+        GAME.timeLeft -= dt;
+        if (GAME.timeLeft <= 0){
+          GAME.timeLeft = 0;
+          updateHUD();
+          drawFrame(t);
+          endGame("timeup");
+          return;
+        }
+
+        GAME.accSpawn += dt * 1000;
+        if (GAME.accSpawn >= CONFIG.game.pipeSpawnEveryMs){
+          GAME.accSpawn = 0;
+          spawnPipe();
+        }
+
+        for (const p of GAME.pipes){
+          p.x -= CONFIG.game.pipeSpeed * dt;
+        }
+        GAME.pipes = GAME.pipes.filter(p => p.x > -CONFIG.game.pipeWidth - 80);
+
+        const b = GAME.bird;
+        b.vy += CONFIG.game.gravity * dt;
+        b.vy = clamp(b.vy, -1200, CONFIG.game.maxFallVelocity);
+        b.y += b.vy * dt;
+
+        const hit = checkCollisions();
+        if (hit){
+          updateHUD();
+          drawFrame(t);
+          handleDeath();
+          return;
+        }
+
+        timerText.textContent = fmtTime(GAME.timeLeft);
+        scoreText.textContent = String(GAME.score);
+
+        drawFrame(t);
+        requestAnimationFrame(loop);
+      }
+
+      /** =========================
+       *  Export
+       *  ========================= */
+      function roundRect2(c, x, y, w, h, r, fillStyle, strokeStyle){
+        const rr = Math.min(r, w/2, h/2);
+        c.beginPath();
+        c.moveTo(x+rr, y);
+        c.arcTo(x+w, y, x+w, y+h, rr);
+        c.arcTo(x+w, y+h, x, y+h, rr);
+        c.arcTo(x, y+h, x, y, rr);
+        c.arcTo(x, y, x+w, y, rr);
+        c.closePath();
+        c.fillStyle = fillStyle;
+        c.fill();
+        c.strokeStyle = strokeStyle;
+        c.lineWidth = 2;
+        c.stroke();
+      }
+
+      function glowCircle(c, x,y,r,color){
+        const gr = c.createRadialGradient(x,y, 0, x,y, r);
+        gr.addColorStop(0, color);
+        gr.addColorStop(1, "rgba(0,0,0,0)");
+        c.fillStyle = gr;
+        c.beginPath();
+        c.arc(x,y,r,0,Math.PI*2);
+        c.fill();
+      }
+
+      function makeExportImage(){
+        const w = exportCanvas.width;
+        const h = exportCanvas.height;
+        const c = exportCtx;
+
+        const g = c.createLinearGradient(0, 0, w, h);
+        g.addColorStop(0, "#060b1a");
+        g.addColorStop(0.55, "#0b1533");
+        g.addColorStop(1, "#0a1433");
+        c.fillStyle = g;
+        c.fillRect(0,0,w,h);
+
+        c.globalAlpha = 0.9;
+        glowCircle(c, w*0.18, h*0.18, 260, "rgba(74,163,255,.22)");
+        glowCircle(c, w*0.86, h*0.22, 280, "rgba(49,211,154,.16)");
+        glowCircle(c, w*0.60, h*0.95, 340, "rgba(43,109,255,.14)");
+        c.globalAlpha = 1;
+
+        try{
+          c.save();
+          c.globalAlpha = 0.55;
+          c.drawImage(canvas, w*0.54, h*0.16, w*0.42, h*0.68);
+          c.restore();
+        } catch(e){ /* ignore */ }
+
+        const cardX = 48, cardY = 48, cardW = Math.floor(w*0.60), cardH = h - 96;
+        roundRect2(c, cardX, cardY, cardW, cardH, 26, "rgba(255,255,255,.05)", "rgba(255,255,255,.12)");
+
+        c.fillStyle = "rgba(234,240,255,.96)";
+        c.font = "900 44px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+        c.fillText(CONFIG.text.brand, cardX + 26, cardY + 74);
+
+        c.fillStyle = "rgba(169,183,229,.95)";
+        c.font = "600 16px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+        c.fillText(CONFIG.text.tagline, cardX + 26, cardY + 104);
+
+        const items = [
+          ["Set", labelDifficulty(GAME.difficulty)],
+          ["Score", String(GAME.score)],
+          ["Lives+", String(GAME.livesPlus)],
+          ["Progress", `${GAME.answered}/${GAME.questions.length}`],
+          ["Time Left", fmtTime(GAME.timeLeft)],
+          ["Status", GAME.state.toUpperCase()],
+        ];
+
+        let y = cardY + 150;
+        for (const [k,v] of items){
+          roundRect2(c, cardX + 26, y, 520, 44, 14, "rgba(255,255,255,.04)", "rgba(255,255,255,.10)");
+          c.fillStyle = "rgba(169,183,229,.95)";
+          c.font = "700 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+          c.fillText(k, cardX + 26 + 16, y + 28);
+
+          c.fillStyle = "rgba(234,240,255,.96)";
+          c.font = "900 18px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+          c.fillText(v, cardX + 26 + 240, y + 30);
+          y += 58;
+        }
+
+        c.fillStyle = "rgba(234,240,255,.78)";
+        c.font = "600 13px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+        c.fillText(`Generated: ${new Date().toLocaleString()}`, cardX + 26, cardY + cardH - 28);
+
+        return exportCanvas.toDataURL("image/png");
+      }
+
+      async function copyPngToClipboard(dataUrl){
+        try{
+          if (!navigator.clipboard || !window.ClipboardItem) throw new Error("Clipboard not supported");
+          const res = await fetch(dataUrl);
+          const blob = await res.blob();
+          await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+          showToast("Đã copy ảnh vào clipboard!", "COPY", "ok");
+        } catch(e){
+          showToast("Không copy được (trình duyệt không hỗ trợ). Hãy tải PNG.", "INFO", "info");
+        }
+      }
+
+      /** =========================
+       *  Events
+       *  ========================= */
+      function bindEvents(){
+        btnStart.addEventListener("click", startFromUI);
+        btnStartTop.addEventListener("click", () => {
+          if (GAME.state === "running") return;
+          if (GAME.state === "paused") return pauseToggle();
+          startFromUI();
+        });
+
+        btnReset.addEventListener("click", resetAll);
+
+        btnWarmup.addEventListener("click", () => {
+          applyDifficulty(selDifficulty.value);
+          applyMinutes(inpMinutes.value);
+          const q = getNextQuestion();
+          if (!q){
+            showToast("Hết câu hỏi trong set. Reset để nạp lại.", "INFO", "info");
+            return;
+          }
+          questionModal.dataset.prevState = GAME.state;
+          setState("question");
+          openQuestionModal(q, { isWarmup:true });
+        });
+
+        btnExport.addEventListener("click", () => {
+          const url = makeExportImage();
+          exportPreview.src = url;
+          btnDownloadImage.href = url;
+          openModal(exportModal);
+          btnDownloadImage.focus({ preventScroll:true });
+        });
+
+        btnCloseExport.addEventListener("click", () => closeModal(exportModal));
+        exportModal.addEventListener("click", (e) => { if (e.target === exportModal) closeModal(exportModal); });
+        btnCopyImage.addEventListener("click", async () => {
+          const url = exportPreview.src;
+          if (!url) return;
+          await copyPngToClipboard(url);
+        });
+
+        btnTeacher.addEventListener("click", () => {
+          openDrawer();
+          if (!GAME.teacherUnlocked) inpTeacherPass.focus({ preventScroll:true });
+        });
+        btnCloseTeacher.addEventListener("click", closeDrawer);
+        drawerBackdrop.addEventListener("click", closeDrawer);
+
+        btnUnlockTeacher.addEventListener("click", () => {
+          const pass = String(inpTeacherPass.value || "");
+          if (pass === CONFIG.teacher.password){
+            GAME.teacherUnlocked = true;
+            teacherLockCard.hidden = true;
+            teacherPanel.hidden = false;
+            selDifficultyTeacher.value = selDifficulty.value;
+            inpMinutesTeacher.value = String(Math.round(GAME.timeTotal/60));
+            updateTeacherMeta();
+            showToast("Teacher Mode unlocked.", "OK", "ok");
+          } else {
+            showToast("Sai mật khẩu.", "NO", "bad");
+            inpTeacherPass.focus({ preventScroll:true });
+          }
+        });
+        inpTeacherPass.addEventListener("keydown", (e) => { if (e.key === "Enter") btnUnlockTeacher.click(); });
+
+        selDifficultyTeacher.addEventListener("change", () => {
+          selDifficulty.value = selDifficultyTeacher.value;
+          applyDifficulty(selDifficulty.value);
+          showToast(`Đã chọn set: ${labelDifficulty(GAME.difficulty)}`, "SET", "info");
+        });
+        inpMinutesTeacher.addEventListener("change", () => {
+          inpMinutes.value = inpMinutesTeacher.value;
+          applyMinutes(inpMinutes.value);
+          showToast(`Timer: ${Math.round(GAME.timeTotal/60)} phút`, "TIME", "info");
+        });
+
+        btnTeacherStart.addEventListener("click", () => {
+          selDifficulty.value = selDifficultyTeacher.value;
+          inpMinutes.value = inpMinutesTeacher.value;
+          startFromUI();
+        });
+        btnTeacherPause.addEventListener("click", pauseToggle);
+        btnTeacherReset.addEventListener("click", resetAll);
+
+        btnTeacherOpenQ.addEventListener("click", () => {
+          const q = getNextQuestion();
+          if (!q){
+            showToast("Hết câu hỏi. Reset để nạp lại.", "INFO", "info");
+            return;
+          }
+          questionModal.dataset.prevState = GAME.state;
+          setState("question");
+          openQuestionModal(q, { isWarmup:true });
+        });
+
+        btnTeacherNextQ.addEventListener("click", () => {
+          if (GAME.qIndex >= GAME.questions.length){
+            showToast("Đã tới cuối set.", "END", "info");
+            return;
+          }
+          GAME.qIndex += 1;
+          updateTeacherMeta();
+          showToast(`Next → ${GAME.qIndex}/${GAME.questions.length}`, "NEXT", "info");
+        });
+
+        btnTeacherRevealQ.addEventListener("click", () => {
+          const q = getNextQuestion();
+          if (!q){
+            showToast("Hết câu hỏi.", "INFO", "info");
+            return;
+          }
+          GAME.revealRequested = true;
+          if (questionModal.classList.contains("open")){
+            highlightCorrect(q);
+            setFeedback({ kind:"info", title:"Teacher Reveal", hint:q.hint, explain:q.explanation });
+          } else {
+            questionModal.dataset.prevState = GAME.state;
+            setState("question");
+            openQuestionModal(q, { isWarmup:true });
+          }
+        });
+
+        qChoices.addEventListener("click", (e) => {
+          const btn = e.target.closest(".choice");
+          if (!btn) return;
+          const idx = Number(btn.getAttribute("data-idx"));
+          onAnswerSelected(idx);
+        });
+
+        btnReveal.addEventListener("click", () => {
+          const q = getNextQuestion();
+          if (!q) return;
+          highlightCorrect(q);
+          setFeedback({ kind:"info", title:"Reveal đáp án", hint:q.hint, explain:q.explanation });
+          showToast("Đã reveal đáp án.", "REVEAL", "info");
+        });
+
+        btnContinue.addEventListener("click", () => {
+          reviveAfterCorrect();
+          closeQuestionModal();
+          setState("running");
+          GAME.lastTick = now();
+          showToast("Hồi sinh! Bay tiếp nào.", "LIFE", "ok");
+          requestAnimationFrame(loop);
+        });
+
+        btnGameOver.addEventListener("click", () => {
+          closeQuestionModal();
+          endGame("over");
+        });
+
+        btnCloseQuestion.addEventListener("click", () => {
+          if (GAME.pendingDeath && !GAME.lastQuestionWasWarmup){
+            showToast("Phải trả lời để tiếp tục!", "LOCK", "bad");
+            return;
+          }
+          closeQuestionModal();
+          const prev = questionModal.dataset.prevState || "idle";
+          if (prev === "running"){
+            setState("running");
+            GAME.lastTick = now();
+            requestAnimationFrame(loop);
+          } else {
+            setState(prev);
+          }
+        });
+
+        questionModal.addEventListener("click", (e) => { if (e.target === questionModal) btnCloseQuestion.click(); });
+
+        // keyboard
+        window.addEventListener("keydown", (e) => {
+          if (e.repeat) return;
+
+          const tag = (document.activeElement && document.activeElement.tagName) ? document.activeElement.tagName.toLowerCase() : "";
+          const typing = tag === "input" || tag === "select" || tag === "textarea";
+
+          if (e.key === "Escape"){
+            if (exportModal.classList.contains("open")) closeModal(exportModal);
+            if (questionModal.classList.contains("open")) btnCloseQuestion.click();
+            if (teacherDrawer.classList.contains("open")) closeDrawer();
+            return;
+          }
+
+          if (!typing && e.key.toLowerCase() === "t"){
+            e.preventDefault();
+            if (teacherDrawer.classList.contains("open")) closeDrawer();
+            else openDrawer();
+            return;
+          }
+
+          if (typing) return;
+
+          if (e.code === "Space"){
+            e.preventDefault();
+            flap();
+          }
+          if (e.key.toLowerCase() === "p") pauseToggle();
+          if (e.key.toLowerCase() === "r") resetAll();
+        }, { passive:false });
+
+        canvas.addEventListener("pointerdown", () => {
+          if (!startOverlay.hidden) return;
+          if (questionModal.classList.contains("open")) return;
+          flap();
+        }, { passive:true });
+
+        window.addEventListener("resize", () => {
+          resizeCanvas();
+          drawFrame(performance.now());
+        }, { passive:true });
+      }
+
+      /** =========================
+       *  Boot
+       *  ========================= */
+      function boot(){
+        // brand
+        brandTitle.textContent = CONFIG.text.brand;
+        brandTagline.textContent = CONFIG.text.tagline;
+        brandLogo.innerHTML = CONFIG.assets.logoSvg; // constant svg
+
+        selDifficulty.value = "easy";
+        inpMinutes.value = String(CONFIG.session.defaultMinutes);
+
+        applyDifficulty("easy");
+        applyMinutes(CONFIG.session.defaultMinutes);
+
+        resizeCanvas();
+        hardReset();
+        setState("idle");
+        startOverlay.hidden = false;
+
+        bindEvents();
+        drawFrame(performance.now());
+
+        showToast("Sẵn sàng. Bấm Start để chơi. Teacher Mode: nút Teacher / phím T (pass: n8n).", "READY", "info");
+      }
+
+      boot();
+    </script>
+  </div>
+</body>
+</html>
