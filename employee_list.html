@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>KPIM Official Staff Directory Mobile</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2bd4bd",
+                        "secondary": "#60A5FA",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#0B1B3A",
+                        "surface-dark": "#162a4d",
+                        "navy-deep": "#0B1B3A",
+                        "accent-teal": "#2DD4BF",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
+                    backdropBlur: {
+                        xs: '2px',
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(43, 212, 189, 0.3);
+            border-radius: 10px;
+        }
+
+        .tech-bg {
+            background-color: #0B1B3A;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(43, 212, 189, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(96, 165, 250, 0.08) 0%, transparent 25%),
+                linear-gradient(to bottom, #0B1B3A, #081226);
+            background-attachment: fixed;
+            background-size: cover;
+        }
+
+        .glass-panel {
+            background: rgba(22, 42, 77, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .glass-card-accent {
+            background: linear-gradient(135deg, rgba(43, 212, 189, 0.1) 0%, rgba(43, 212, 189, 0.02) 100%);
+            border: 1px solid rgba(43, 212, 189, 0.2);
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(43, 212, 189, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.5;
+            }
+
+            90% {
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: translateY(-100px) translateX(50px);
+                opacity: 0;
+            }
+        }
+
+        .mobile-card-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease;
+            opacity: 0;
+        }
+
+        .mobile-card.expanded .mobile-card-details {
+            max-height: 200px;
+            opacity: 1;
+            padding-top: 0.75rem;
+        }
+
+        .mobile-card.expanded {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(43, 212, 189, 0.3);
+        }
+
+        .status-dot {
+            box-shadow: 0 0 0 2px #0B1B3A;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-dark text-gray-100 font-display tech-bg h-screen w-screen overflow-hidden flex flex-col selection:bg-primary selection:text-navy-deep relative">
+    <div class="particle w-2 h-2 top-[80%] left-[10%]" style="animation-duration: 25s; animation-delay: 0s;"></div>
+    <div class="particle w-1 h-1 top-[60%] left-[30%]" style="animation-duration: 18s; animation-delay: 5s;"></div>
+    <div class="particle w-3 h-3 top-[90%] left-[70%]" style="animation-duration: 30s; animation-delay: 2s;"></div>
+    <div class="particle w-1.5 h-1.5 top-[50%] left-[85%]" style="animation-duration: 22s; animation-delay: 8s;"></div>
+    <header
+        class="h-16 shrink-0 glass-panel border-b border-white/5 flex items-center justify-between px-4 md:px-6 z-50">
+        <div class="flex items-center gap-3 md:gap-4">
+            <div
+                class="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-primary/20 flex items-center justify-center border border-primary/30 shadow-[0_0_15px_rgba(43,212,189,0.2)]">
+                <i class="fa-solid fa-graduation-cap text-primary text-sm md:text-lg"></i>
+            </div>
+            <div>
+                <h1 class="text-base md:text-lg font-bold tracking-tight text-white leading-tight">KPIM Academy</h1>
+                <p class="text-[10px] md:text-xs text-secondary font-medium tracking-widest uppercase opacity-90">DANH
+                    SÁCH NHÂN SỰ</p>
+            </div>
+        </div>
+    </header>
+    <main class="flex-1 flex flex-col overflow-hidden relative z-10">
+        <div class="w-full flex flex-col z-20 shrink-0 border-b border-white/5 bg-background-dark/30 backdrop-blur-sm">
+            <div class="p-4 pb-2 space-y-3">
+                <div class="relative group">
+                    <div
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-primary text-gray-500">
+                        <i class="fa-solid fa-search text-sm"></i>
+                    </div>
+                    <input
+                        class="block w-full pl-10 pr-3 py-2 border border-white/10 rounded-xl leading-5 bg-surface-dark/50 text-gray-300 placeholder-gray-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 text-sm transition-all shadow-inner"
+                        id="searchInput" placeholder="Tìm kiếm nhân sự..." type="text" />
+                </div>
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                    <button
+                        class="filter-chip active flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/20 border border-primary/30 whitespace-nowrap transition-all hover:bg-primary/30 group shrink-0"
+                        data-filter="all">
+                        <div class="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(43,212,189,0.8)]"></div>
+                        <span class="text-xs text-white font-medium">Tất cả</span>
+                    </button>
+                    <button
+                        class="filter-chip flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-dark border border-white/5 whitespace-nowrap transition-all hover:bg-white/5 hover:border-white/10 group shrink-0"
+                        data-filter="bod">
+                        <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                        <span class="text-xs text-gray-400 group-hover:text-white font-medium">Ban điều hành</span>
+                    </button>
+                    <button
+                        class="filter-chip flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-dark border border-white/5 whitespace-nowrap transition-all hover:bg-white/5 hover:border-white/10 group shrink-0"
+                        data-filter="bi">
+                        <div class="w-1.5 h-1.5 rounded-full bg-purple-500"></div>
+                        <span class="text-xs text-gray-400 group-hover:text-white font-medium">BI Analyst</span>
+                    </button>
+                    <button
+                        class="filter-chip flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-dark border border-white/5 whitespace-nowrap transition-all hover:bg-white/5 hover:border-white/10 group shrink-0"
+                        data-filter="engineer">
+                        <div class="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
+                        <span class="text-xs text-gray-400 group-hover:text-white font-medium">Engineer</span>
+                    </button>
+                    <button
+                        class="filter-chip flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-dark border border-white/5 whitespace-nowrap transition-all hover:bg-white/5 hover:border-white/10 group shrink-0"
+                        data-filter="marketing">
+                        <div class="w-1.5 h-1.5 rounded-full bg-pink-500"></div>
+                        <span class="text-xs text-gray-400 group-hover:text-white font-medium">Marketing</span>
+                    </button>
+                    <button
+                        class="filter-chip flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-dark border border-white/5 whitespace-nowrap transition-all hover:bg-white/5 hover:border-white/10 group shrink-0"
+                        data-filter="intern">
+                        <div class="w-1.5 h-1.5 rounded-full bg-gray-500"></div>
+                        <span class="text-xs text-gray-400 group-hover:text-white font-medium">Intern</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <section class="flex-1 h-full overflow-hidden flex flex-col relative w-full">
+            <div class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar pb-20" id="mobileStaffList">
+                <div class="mobile-card glass-panel rounded-xl p-3 border border-white/5 active:bg-white/5 transition-all cursor-pointer group"
+                    onclick="this.classList.toggle('expanded')">
+                    <div class="flex items-center gap-3">
+                        <div class="relative shrink-0">
+                            <img class="w-12 h-12 rounded-full object-cover ring-2 ring-white/10"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2u0Vm8HGOMct98t4c6Sij23GDLe-EtYAmXTUwKmU59jGjJnoce7wuby4BEM7TaFvpNBDEJkAlvW49iS83FSKyaXw_NujJfJefkRFjwRUvTCaA7sRMSohF7oH_kXjQW-H042ntFIHp5Updj8QYAydQBhIWJ1rOpmXcTCfHfSksBPgmHqWyyCeP6WhF-wPAbFBjKRdYsdkgp_i3rCzVjvSTMcTjjfXdVdjtlmn5mNBdnadNGWw3_bo_RoCqMp7GoG4PrD62wOb_ctrL" />
+                            <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full status-dot"></div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-bold text-white truncate">Trần Minh Khôi</h3>
+                            <p class="text-xs text-primary truncate">Chief Executive Officer</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span
+                                    class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">Full-time</span>
+                                <span class="text-[10px] text-gray-400"><i
+                                        class="fa-solid fa-location-dot mr-1"></i>HN</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 shrink-0">
+                            <button
+                                class="w-8 h-8 rounded-full bg-surface-dark border border-white/10 flex items-center justify-center text-primary hover:bg-primary hover:text-navy-deep transition"
+                                onclick="event.stopPropagation()">
+                                <i class="fa-solid fa-phone text-xs"></i>
+                            </button>
+                            <button
+                                class="w-8 h-8 rounded-full bg-surface-dark border border-white/10 flex items-center justify-center text-secondary hover:bg-secondary hover:text-navy-deep transition"
+                                onclick="event.stopPropagation()">
+                                <i class="fa-solid fa-envelope text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mobile-card-details border-t border-white/5 mt-3 pt-0">
+                        <div class="grid grid-cols-1 gap-2 text-xs">
+                            <div class="flex justify-between items-center py-1">
+                                <span class="text-gray-500 uppercase">Phone</span>
+                                <span class="text-white font-mono">+84 9xx xxx xxx</span>
+                            </div>
+                            <div class="flex justify-between items-center py-1">
+                                <span class="text-gray-500 uppercase">Email</span>
+                                <span class="text-white truncate">khoi.tran@kpim.vn</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mobile-card glass-panel rounded-xl p-3 border border-white/5 active:bg-white/5 transition-all cursor-pointer group"
+                    onclick="this.classList.toggle('expanded')">
+                    <div class="flex items-center gap-3">
+                        <div class="relative shrink-0">
+                            <img class="w-12 h-12 rounded-full object-cover ring-2 ring-white/10"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJ7l76hqrktQYxseaZ38jx5qBjrVhUbKVxyLj2oUszZCKbEajv0KAPJ-Vj5aoQtj3FHpXIlrVMcT-Eke1qH13Ndrcf_lE5pEC78hJX0gMv0fFWDCBN2vr6G6jVz-WyUBSOoIHQH2XjmiUAu-LGmyBBMehysHPAp6T6psYo01Lk8yyoXC1NnSU_GIjhzAzVtomATFKJY3XWECvpjXit47260y0UhhF5laBs4QJau3ROP65aNiPIj6DeQIfcXOuJ-Mpr_aRT4EChWGmx" />
+                            <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full status-dot"></div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-bold text-white truncate">Lê Hữu Phát</h3>
+                            <p class="text-xs text-primary truncate">Chief Operation Officer</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span
+                                    class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">Full-time</span>
+                                <span class="text-[10px] text-gray-400"><i
+                                        class="fa-solid fa-location-dot mr-1"></i>HN</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 shrink-0">
+                            <button
+                                class="w-8 h-8 rounded-full bg-surface-dark border border-white/10 flex items-center justify-center text-primary hover:bg-primary hover:text-navy-deep transition"
+                                onclick="event.stopPropagation()">
+                                <i class="fa-solid fa-phone text-xs"></i>
+                            </button>
+                            <button
+                                class="w-8 h-8 rounded-full bg-surface-dark border border-white/10 flex items-center justify-center text-secondary hover:bg-secondary hover:text-navy-deep transition"
+                                onclick="event.stopPropagation()">
+                                <i class="fa-solid fa-envelope text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mobile-card-details border-t border-white/5 mt-3 pt-0">
+                        <div class="grid grid-cols-1 gap-2 text-xs">
+                            <div class="flex justify-between items-center py-1">
+                                <span class="text-gray-500 uppercase">Phone</span>
+                                <span class="text-white font-mono">+84 9xx xxx xxx</span>
+                            </div>
+                            <div class="flex justify-between items-center py-1">
+                                <span class="text-gray-500 uppercase">Email</span>
+                                <span class="text-white truncate">phat.le@kpim.vn</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mobile-card glass-panel rounded-xl p-3 border border-white/5 active:bg-white/5 transition-all cursor-pointer group"
+                    onclick="this.classList.toggle('expanded')">
+                    <div class="flex items-center gap-3">
+                        <div class="relative shrink-0">
+                            <img class="w-12 h-12 rounded-full object-cover ring-2 ring-white/10"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDw-8-Yt2OfsAGoMRritEHDQll_ssZGwL3EhVQRMeRBxZOGZ3EiO7dasMEKPFuyBhI-bLnB_m9uVGkYubsUlksp8Rel9iyfx1VDU5ZpDa-KnfBT_LfAj02UDGK-CBuhQtX9qxzw_ZdSdBvZfP7xPg1fLk5m0GpjG_QDz2gX2xA2h5MkRD6sEe7rJDW3F39806XdZeJojH74LnW-KDF7nQ87CEs9w7nk_pIa2MtgiLlerd614rbzFBMUlQmM985Yk-2Nf_hpPFQOS7Au" />
+                            <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full status-dot"></div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-bold text-white truncate">Đặng Quốc Huy</h3>
+                            <p class="text-xs text-primary truncate">Chief Technology Officer</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span
+                                    class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">Full-time</span>
+                                <span class="text-[10px] text-gray-400"><i
+                                        class="fa-solid fa-location-dot mr-1"></i>HN</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 shrink-0">
+                            <button
+                                class="w-8 h-8 rounded-full bg-surface-dark border border-white/10 flex items-center justify-center text-primary hover:bg-primary hover:text-navy-deep transition"
+                                onclick="event.stopPropagation()">
+                                <i class="fa-solid fa-phone text-xs"></i>
+                            </button>
+                            <button
+                                class="w-8 h-8 rounded-full bg-surface-dark border border-white/10 flex items-center justify-center text-secondary hover:bg-secondary hover:text-navy-deep transition"
+                                onclick="event.stopPropagation()">
+                                <i class="fa-solid fa-envelope text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mobile-card-details border-t border-white/5 mt-3 pt-0">
+                        <div class="grid grid-cols-1 gap-2 text-xs">
+                            <div class="flex justify-between items-center py-1">
+                                <span class="text-gray-500 uppercase">Phone</span>
+                                <span class="text-white font-mono">+84 9xx xxx xxx</span>
+                            </div>
+                            <div class="flex justify-between items-center py-1">
+                                <span class="text-gray-500 uppercase">Email</span>
+                                <span class="text-white truncate">huy.dang@kpim.vn</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mobile-card glass-panel rounded-xl p-3 border border-white/5 active:bg-white/5 transition-all cursor-pointer group"
+                    onclick="this.classList.toggle('expanded')">
+                    <div class="flex items-center gap-3">
+                        <div class="relative shrink-0">
+                            <img class="w-12 h-12 rounded-full object-cover ring-2 ring-white/10"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDbPiF-QzyR6cxIdPm7Lg9VTnvmIRzMlv2WXDbWEwsfUAeUumaReKS7LKpKZT9tLeKuLBqr_F7j6zgtJ1MSeocuhjYo5-F-cDB4HZdbYfKGDvQUbFgBY6JNxG42TybD4sm12EQbNza1g9GashAEWDva6W9aDQuzDoroiSFO0lzAY8CQG28nuwvB7W6ZOfpkFUJrJ1tCue_QUJ0PNseQltEOi0cntGIs5qS9cANwrDane8EVglsyjXlynj9kLO3YlXE8i9oo2gIH9tG" />
+                            <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full status-dot"></div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-bold text-white truncate">Ngô Nhật Minh</h3>
+                            <p class="text-xs text-primary truncate">Business Intelligence Analyst</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span
+                                    class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">Full-time</span>
+                                <span class="text-[10px] text-gray-400"><i
+                                        class="fa-solid fa-location-dot mr-1"></i>SG</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 shrink-0">
+                            <button
+                                class="w-8 h-8 rounded-full bg-surface-dark border border-white/10 flex items-center justify-center text-primary hover:bg-primary hover:text-navy-deep transition"
+                                onclick="event.stopPropagation()">
+                                <i class="fa-solid fa-phone text-xs"></i>
+                            </button>
+                            <button
+                                class="w-8 h-8 rounded-full bg-surface-dark border border-white/10 flex items-center justify-center text-secondary hover:bg-secondary hover:text-navy-deep transition"
+                                onclick="event.stopPropagation()">
+                                <i class="fa-solid fa-envelope text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mobile-card-details border-t border-white/5 mt-3 pt-0">
+                        <div class="grid grid-cols-1 gap-2 text-xs">
+                            <div class="flex justify-between items-center py-1">
+                                <span class="text-gray-500 uppercase">Phone</span>
+                                <span class="text-white font-mono">+84 9xx xxx xxx</span>
+                            </div>
+                            <div class="flex justify-between items-center py-1">
+                                <span class="text-gray-500 uppercase">Email</span>
+                                <span class="text-white truncate">minh.ngo@kpim.vn</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mobile-card glass-panel rounded-xl p-3 border border-white/5 active:bg-white/5 transition-all cursor-pointer group"
+                    onclick="this.classList.toggle('expanded')">
+                    <div class="flex items-center gap-3">
+                        <div class="relative shrink-0">
+                            <img class="w-12 h-12 rounded-full object-cover ring-2 ring-white/10"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmToHWbKQYvACEMYeRe1YbGPiMbnZpsK2GFEac7RRlLg6oS-5K5RsQw1n-rCz73R9fPZ5zdQ0hNdxRCiVfLJ0NbMJv5EzlD-riDkym5oB4PNYjbcNQzszRgvJouYWwjIRcJFutN1YDaKqbZIX_inMD6aqMZ69cslBo7w2FmEMmaF00X5xJQ4cdsMBSbH79l-7x4rh0BEvfV2dP0IzzuUrQw1LmXvZ4uXrUJy9qjCvIh8RThvjFpeYq3TpIDjdAOxXsthaoTvWvbvEC" />
+                            <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full status-dot"></div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-bold text-white truncate">Phạm Gia Minh</h3>
+                            <p class="text-xs text-primary truncate">Business Intelligence Analyst</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span
+                                    class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">Full-time</span>
+                                <span class="text-[10px] text-gray-400"><i
+                                        class="fa-solid fa-location-dot mr-1"></i>HN</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 shrink-0">
+                            <button
+                                class="w-8 h-8 rounded-full bg-surface-dark border border-white/10 flex items-center justify-center text-primary hover:bg-primary hover:text-navy-deep transition"
+                                onclick="event.stopPropagation()">
+                                <i class="fa-solid fa-phone text-xs"></i>
+                            </button>
+                            <button
+                                class="w-8 h-8 rounded-full bg-surface-dark border border-white/10 flex items-center justify-center text-secondary hover:bg-secondary hover:text-navy-deep transition"
+                                onclick="event.stopPropagation()">
+                                <i class="fa-solid fa-envelope text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mobile-card-details border-t border-white/5 mt-3 pt-0">
+                        <div class="grid grid-cols-1 gap-2 text-xs">
+                            <div class="flex justify-between items-center py-1">
+                                <span class="text-gray-500 uppercase">Phone</span>
+                                <span class="text-white font-mono">+84 9xx xxx xxx</span>
+                            </div>
+                            <div class="flex justify-between items-center py-1">
+                                <span class="text-gray-500 uppercase">Email</span>
+                                <span class="text-white truncate">gia.minh@kpim.vn</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    // This script block generates the remaining list items to reach 23
+                    const container = document.getElementById('mobileStaffList');
+                    const existingCount = 5;
+                    const targetCount = 23;
+                    const roles = ['Business Intelligence Analyst', 'Data Engineer', 'Marketing Executive', 'Intern'];
+                    const locations = ['HN', 'SG'];
+                    const names = [
+                        'Nguyễn Văn A', 'Trần Thị B', 'Lê Văn C', 'Phạm Thị D', 'Hoàng Văn E',
+                        'Đỗ Thị F', 'Vũ Văn G', 'Ngô Thị H', 'Bùi Văn I', 'Đặng Thị K',
+                        'Phan Văn L', 'Dương Thị M', 'Lý Văn N', 'Hồ Thị O', 'Mai Văn P',
+                        'Cao Thị Q', 'Trương Văn R', 'Đinh Thị S'
+                    ];
+                    for (let i = existingCount + 1; i <= targetCount; i++) {
+                        const name = names[(i - existingCount - 1) % names.length];
+                        const role = roles[(i - existingCount - 1) % roles.length];
+                        const loc = locations[(i - existingCount - 1) % locations.length];
+                        const type = role === 'Intern' ? 'Intern' : 'Full-time';
+                        const typeColor = role === 'Intern' ? 'bg-gray-500/20 text-gray-300 border-gray-500/30' : 'bg-blue-500/20 text-blue-300 border-blue-500/30';
+                        const cardHTML = `
+            <div class="mobile-card glass-panel rounded-xl p-3 border border-white/5 active:bg-white/5 transition-all cursor-pointer group" onclick="this.classList.toggle('expanded')">
+                <div class="flex items-center gap-3">
+                    <div class="relative shrink-0">
+                        <img class="w-12 h-12 rounded-full object-cover ring-2 ring-white/10" src="https://i.pravatar.cc/150?u=${i}"/>
+                        <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full status-dot"></div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-sm font-bold text-white truncate">${name}</h3>
+                        <p class="text-xs text-primary truncate">${role}</p>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-[10px] px-1.5 py-0.5 rounded ${typeColor} border">${type}</span>
+                            <span class="text-[10px] text-gray-400"><i class="fa-solid fa-location-dot mr-1"></i>${loc}</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 shrink-0">
+                        <button class="w-8 h-8 rounded-full bg-surface-dark border border-white/10 flex items-center justify-center text-primary hover:bg-primary hover:text-navy-deep transition" onclick="event.stopPropagation()">
+                            <i class="fa-solid fa-phone text-xs"></i>
+                        </button>
+                        <button class="w-8 h-8 rounded-full bg-surface-dark border border-white/10 flex items-center justify-center text-secondary hover:bg-secondary hover:text-navy-deep transition" onclick="event.stopPropagation()">
+                            <i class="fa-solid fa-envelope text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="mobile-card-details border-t border-white/5 mt-3 pt-0">
+                    <div class="grid grid-cols-1 gap-2 text-xs">
+                        <div class="flex justify-between items-center py-1">
+                            <span class="text-gray-500 uppercase">Phone</span>
+                            <span class="text-white font-mono">+84 9xx xxx xxx</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1">
+                            <span class="text-gray-500 uppercase">Email</span>
+                            <span class="text-white truncate">staff.${i}@kpim.vn</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+                        container.insertAdjacentHTML('beforeend', cardHTML);
+                    }
+                </script>
+            </div>
+        </section>
+    </main>
+    <script>
+        // Simple Interaction Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterChips = document.querySelectorAll('.filter-chip');
+            const resetBtn = document.getElementById('resetFiltersBtn');
+            const searchInput = document.getElementById('searchInput');
+            // 1. Chip Selection Logic
+            filterChips.forEach(chip => {
+                chip.addEventListener('click', () => {
+                    // Remove active class from all
+                    filterChips.forEach(c => {
+                        c.classList.remove('active', 'bg-primary/20', 'border-primary/30');
+                        c.classList.add('bg-surface-dark', 'border-white/5');
+                        const dot = c.querySelector('div');
+                        if (dot.parentElement.dataset.filter === 'all') {
+                            dot.classList.remove('shadow-[0_0_8px_rgba(43,212,189,0.8)]');
+                        }
+                    });
+                    // Add active class to clicked
+                    chip.classList.add('active', 'bg-primary/20', 'border-primary/30');
+                    chip.classList.remove('bg-surface-dark', 'border-white/5');
+                    if (chip.dataset.filter === 'all') {
+                        chip.querySelector('div').classList.add('shadow-[0_0_8px_rgba(43,212,189,0.8)]');
+                    }
+                });
+            });
+            // 2. Reset Button (if exists)
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    // Reset search
+                    searchInput.value = '';
+                    // Reset chips to 'All'
+                    filterChips.forEach(c => {
+                        c.classList.remove('active', 'bg-primary/20', 'border-primary/30');
+                        c.classList.add('bg-surface-dark', 'border-white/5');
+                        if (c.dataset.filter === 'all') {
+                            c.querySelector('div').classList.remove('shadow-[0_0_8px_rgba(43,212,189,0.8)]');
+                        }
+                    });
+                    const allChip = document.querySelector('[data-filter="all"]');
+                    if (allChip) {
+                        allChip.classList.add('active', 'bg-primary/20', 'border-primary/30');
+                        allChip.classList.remove('bg-surface-dark', 'border-white/5');
+                        allChip.querySelector('div').classList.add('shadow-[0_0_8px_rgba(43,212,189,0.8)]');
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>
