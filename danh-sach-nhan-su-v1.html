@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Danh sách nhân sự Agribank</title>
+  <style>
+    :root {
+      --brand-red: #AD1C3E;
+      --brand-red-soft: #F8E8ED;
+      --brand-green: #014C34;
+      --brand-green-soft: #E7F2EE;
+      --brand-yellow: #FEDC00;
+      --bg: #F5F7FA;
+      --panel: #FFFFFF;
+      --border: #D9E0E7;
+      --text: #1F2937;
+      --muted: #667085;
+      --shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background:
+        linear-gradient(180deg, rgba(173, 28, 62, 0.05), rgba(173, 28, 62, 0) 180px),
+        var(--bg);
+      color: var(--text);
+    }
+
+    .page {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      background: var(--panel);
+      border: 1px solid rgba(1, 76, 52, 0.12);
+      border-left: 8px solid var(--brand-red);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 22px 26px;
+      margin-bottom: 22px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .logo-wrap {
+      width: 88px;
+      height: 88px;
+      border-radius: 20px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(1, 76, 52, 0.12);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5);
+      flex: 0 0 auto;
+    }
+
+    .logo-wrap img {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .header-title {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.2;
+      color: var(--brand-red);
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+
+    .header-subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .header-tag {
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(1, 76, 52, 0.96), rgba(1, 76, 52, 0.82));
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      box-shadow: 0 12px 20px rgba(1, 76, 52, 0.12);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid rgba(1, 76, 52, 0.10);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .kpi {
+      padding: 18px 18px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi::after {
+      content: "";
+      position: absolute;
+      right: -18px;
+      top: -18px;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: rgba(1, 76, 52, 0.05);
+    }
+
+    .kpi-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .kpi-label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .kpi-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      border: 1px solid transparent;
+    }
+
+    .icon-red { background: var(--brand-red-soft); color: var(--brand-red); border-color: rgba(173, 28, 62, 0.12); }
+    .icon-green { background: var(--brand-green-soft); color: var(--brand-green); border-color: rgba(1, 76, 52, 0.12); }
+    .icon-yellow { background: rgba(254, 220, 0, 0.18); color: #8A6A00; border-color: rgba(254, 220, 0, 0.35); }
+
+    .kpi-value {
+      margin: 0;
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      color: var(--text);
+    }
+
+    .kpi-note {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .insights {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .section-card {
+      padding: 18px 18px 16px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 18px;
+      color: var(--brand-green);
+      font-weight: 800;
+    }
+
+    .section-caption {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .chart-area {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 10px 16px;
+      align-items: center;
+    }
+
+    .donut-wrap {
+      display: grid;
+      place-items: center;
+      min-height: 260px;
+    }
+
+    .donut {
+      width: 240px;
+      height: 240px;
+      position: relative;
+    }
+
+    .donut svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+      overflow: visible;
+    }
+
+    .donut-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .donut-center .label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .donut-center .value {
+      font-size: 34px;
+      font-weight: 800;
+      color: var(--brand-green);
+      line-height: 1;
+    }
+
+    .legend {
+      display: grid;
+      gap: 12px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(1, 76, 52, 0.08);
+      background: #FBFCFE;
+    }
+
+    .legend-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+
+    .legend-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .legend-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .legend-value {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--brand-red);
+      white-space: nowrap;
+    }
+
+    .extra-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .mini-stat {
+      border-radius: 16px;
+      padding: 16px;
+      background: linear-gradient(180deg, #FFFFFF, #F9FBFC);
+      border: 1px solid rgba(1, 76, 52, 0.08);
+    }
+
+    .mini-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .mini-value {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--brand-red);
+      line-height: 1.1;
+    }
+
+    .mini-desc {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .table-card {
+      padding: 18px 18px 14px;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .toolbar-left, .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      position: relative;
+      min-width: 280px;
+    }
+
+    .search-box input, .filter-select {
+      height: 42px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 0 14px;
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding-left: 40px;
+    }
+
+    .search-box input:focus, .filter-select:focus {
+      border-color: rgba(173, 28, 62, 0.45);
+      box-shadow: 0 0 0 4px rgba(173, 28, 62, 0.08);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    .toolbar-note {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .table-wrap {
+      border: 1px solid rgba(1, 76, 52, 0.10);
+      border-radius: 18px;
+      overflow: auto;
+      max-height: 620px;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 1080px;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: linear-gradient(180deg, #F7FAF8, #EFF5F2);
+      color: var(--brand-green);
+      font-size: 13px;
+      font-weight: 800;
+      padding: 14px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    thead th:first-child { border-top-left-radius: 18px; }
+    thead th:last-child { border-top-right-radius: 18px; }
+
+    tbody td {
+      padding: 13px 14px;
+      border-bottom: 1px solid #EEF2F6;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #FCFDFE;
+    }
+
+    tbody tr:hover {
+      background: #F8FBFA;
+    }
+
+    .mono {
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 13px;
+    }
+
+    .name-cell {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .email {
+      color: #374151;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .badge-male {
+      color: var(--brand-green);
+      background: var(--brand-green-soft);
+      border-color: rgba(1, 76, 52, 0.12);
+    }
+
+    .badge-female {
+      color: var(--brand-red);
+      background: var(--brand-red-soft);
+      border-color: rgba(173, 28, 62, 0.12);
+    }
+
+    .badge-other {
+      color: #755B00;
+      background: rgba(254, 220, 0, 0.20);
+      border-color: rgba(254, 220, 0, 0.35);
+    }
+
+    .leave-badge {
+      min-width: 56px;
+    }
+
+    .leave-safe {
+      color: var(--brand-green);
+      background: rgba(1, 76, 52, 0.08);
+      border-color: rgba(1, 76, 52, 0.12);
+    }
+
+    .leave-warn {
+      color: #8A4B00;
+      background: rgba(254, 220, 0, 0.22);
+      border-color: rgba(254, 220, 0, 0.35);
+    }
+
+    .leave-danger {
+      color: var(--brand-red);
+      background: rgba(173, 28, 62, 0.10);
+      border-color: rgba(173, 28, 62, 0.16);
+    }
+
+    .empty {
+      padding: 34px 16px;
+      text-align: center;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .sort-indicator {
+      color: #9AA4B2;
+      margin-left: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .footer {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+      padding: 4px 2px;
+    }
+
+    @media (max-width: 1200px) {
+      .cards {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .insights {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .page {
+        padding: 16px;
+      }
+      .header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .header-tag {
+        align-self: flex-start;
+      }
+      .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .chart-area {
+        grid-template-columns: 1fr;
+      }
+      .donut-wrap {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .cards {
+        grid-template-columns: 1fr;
+      }
+      .search-box {
+        min-width: 100%;
+        width: 100%;
+      }
+      .toolbar-left, .toolbar-right {
+        width: 100%;
+      }
+      .filter-select {
+        width: 100%;
+      }
+      .header-title {
+        font-size: 24px;
+      }
+      .logo-wrap {
+        width: 74px;
+        height: 74px;
+      }
+      .logo-wrap img {
+        width: 60px;
+        height: 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="header-left">
+        <div class="logo-wrap">
+          <img src="data:image/webp;base64,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" alt="Agribank Logo" />
+        </div>
+        <div>
+          <h1 class="header-title">Danh sách nhân sự Agribank</h1>
+          <p class="header-subtitle">Báo cáo tổng quan thông tin nhân sự nội bộ</p>
+        </div>
+      </div>
+      <div class="header-tag">Bảng điều hành nhân sự nội bộ</div>
+    </header>
+
+    <section class="cards" id="kpiCards"></section>
+
+    <section class="insights">
+      <div class="card section-card">
+        <div class="section-head">
+          <h2 class="section-title">Cơ cấu giới tính</h2>
+          <div class="section-caption">Biểu đồ Donut Chart</div>
+        </div>
+        <div class="chart-area">
+          <div class="donut-wrap">
+            <div class="donut">
+              <svg viewBox="0 0 220 220" aria-label="Biểu đồ cơ cấu giới tính">
+                <circle cx="110" cy="110" r="72" fill="none" stroke="#EEF2F6" stroke-width="24"></circle>
+                <g id="donutSegments"></g>
+              </svg>
+              <div class="donut-center">
+                <div class="label">Tổng nhân sự</div>
+                <div class="value" id="donutTotal">0</div>
+              </div>
+            </div>
+          </div>
+          <div class="legend" id="chartLegend"></div>
+        </div>
+      </div>
+
+      <div class="card section-card">
+        <div class="section-head">
+          <h2 class="section-title">Chỉ số phép năm</h2>
+          <div class="section-caption">Tổng hợp nhanh</div>
+        </div>
+        <div class="extra-grid" id="leaveSummary"></div>
+      </div>
+    </section>
+
+    <section class="card table-card">
+      <div class="section-head">
+        <h2 class="section-title">Danh sách nhân sự</h2>
+        <div class="section-caption">Tra cứu & lọc dữ liệu</div>
+      </div>
+
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <div class="search-box">
+            <span class="search-icon">⌕</span>
+            <input type="text" id="searchInput" placeholder="Tìm theo ID, họ tên hoặc email..." />
+          </div>
+          <select class="filter-select" id="genderFilter" aria-label="Lọc giới tính">
+            <option value="all">Tất cả giới tính</option>
+            <option value="Nam">Nam</option>
+            <option value="Nữ">Nữ</option>
+            <option value="Khác">Khác</option>
+          </select>
+        </div>
+        <div class="toolbar-right">
+          <div class="toolbar-note" id="resultCount">0 nhân sự</div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-key="id">ID Nhân Sự <span class="sort-indicator" data-indicator="id">↕</span></th>
+              <th data-key="name">Họ Tên <span class="sort-indicator" data-indicator="name">↕</span></th>
+              <th data-key="email">Email <span class="sort-indicator" data-indicator="email">↕</span></th>
+              <th data-key="gender">Giới Tính <span class="sort-indicator" data-indicator="gender">↕</span></th>
+              <th data-key="birthDate">Ngày Sinh <span class="sort-indicator" data-indicator="birthDate">↕</span></th>
+              <th data-key="joinDate">Ngày Vào Làm <span class="sort-indicator" data-indicator="joinDate">↕</span></th>
+              <th data-key="annualLeave">Số ngày phép năm <span class="sort-indicator" data-indicator="annualLeave">↕</span></th>
+              <th data-key="usedLeave">Ngày phép đã sử dụng <span class="sort-indicator" data-indicator="usedLeave">↕</span></th>
+              <th data-key="remainingLeave">Ngày phép còn lại <span class="sort-indicator" data-indicator="remainingLeave">↕</span></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="footer">Nguồn dữ liệu: Danh sách nhân sự nội bộ</div>
+    </section>
+  </div>
+
+  <script>
+    // Embedded dataset from Excel
+    const rawData = [
+  {
+    "id": "NV0001",
+    "email": "duc.nguyen.quang@kpim.vn",
+    "name": "Nguyễn Quang Đức",
+    "gender": "Nam",
+    "birthDate": "1994-01-22",
+    "joinDate": "2024-10-07",
+    "annualLeave": 18,
+    "usedLeave": 8,
+    "remainingLeave": 10
+  },
+  {
+    "id": "NV0002",
+    "email": "phuc.pham.duc@kpim.vn",
+    "name": "Phạm Đức Phúc",
+    "gender": "Nam",
+    "birthDate": "2003-12-21",
+    "joinDate": "2020-10-13",
+    "annualLeave": 18,
+    "usedLeave": 7,
+    "remainingLeave": 11
+  },
+  {
+    "id": "NV0003",
+    "email": "hai.nguyen.hoang@kpim.vn",
+    "name": "Nguyễn Hoàng Hải",
+    "gender": "Nam",
+    "birthDate": "1994-01-25",
+    "joinDate": "2023-06-15",
+    "annualLeave": 15,
+    "usedLeave": 5,
+    "remainingLeave": 10
+  },
+  {
+    "id": "NV0004",
+    "email": "phuong.le.thu@kpim.vn",
+    "name": "Lê Thu Phương",
+    "gender": "Nữ",
+    "birthDate": "1988-09-27",
+    "joinDate": "2020-12-09",
+    "annualLeave": 18,
+    "usedLeave": 5,
+    "remainingLeave": 13
+  },
+  {
+    "id": "NV0005",
+    "email": "linh.ngo.nhat@kpim.vn",
+    "name": "Ngô Nhật Linh",
+    "gender": "Nam",
+    "birthDate": "1975-11-01",
+    "joinDate": "2021-04-02",
+    "annualLeave": 18,
+    "usedLeave": 5,
+    "remainingLeave": 13
+  },
+  {
+    "id": "NV0006",
+    "email": "long.tran.minh@kpim.vn",
+    "name": "Trần Minh Long",
+    "gender": "Nam",
+    "birthDate": "1984-06-01",
+    "joinDate": "2023-02-05",
+    "annualLeave": 15,
+    "usedLeave": 3,
+    "remainingLeave": 12
+  },
+  {
+    "id": "NV0007",
+    "email": "vy.do.thu@kpim.vn",
+    "name": "Đỗ Thu Vy",
+    "gender": "Nam",
+    "birthDate": "1991-04-24",
+    "joinDate": "2021-07-21",
+    "annualLeave": 15,
+    "usedLeave": 2,
+    "remainingLeave": 13
+  },
+  {
+    "id": "NV0008",
+    "email": "phuong.nguyen.ngoc@kpim.vn",
+    "name": "Nguyễn Ngọc Phương",
+    "gender": "Nam",
+    "birthDate": "2002-10-21",
+    "joinDate": "2024-02-02",
+    "annualLeave": 16,
+    "usedLeave": 5,
+    "remainingLeave": 11
+  },
+  {
+    "id": "NV0009",
+    "email": "duc.dang.bao@kpim.vn",
+    "name": "Đặng Bảo Đức",
+    "gender": "Nam",
+    "birthDate": "1977-04-19",
+    "joinDate": "2021-01-20",
+    "annualLeave": 16,
+    "usedLeave": 10,
+    "remainingLeave": 6
+  },
+  {
+    "id": "NV0010",
+    "email": "thao.nguyen.huu@kpim.vn",
+    "name": "Nguyễn Hữu Thảo",
+    "gender": "Nữ",
+    "birthDate": "1984-04-27",
+    "joinDate": "2024-04-24",
+    "annualLeave": 16,
+    "usedLeave": 5,
+    "remainingLeave": 11
+  },
+  {
+    "id": "NV0011",
+    "email": "anh.vo.nhat@kpim.vn",
+    "name": "Võ Nhật Anh",
+    "gender": "Nam",
+    "birthDate": "1991-05-08",
+    "joinDate": "2023-05-14",
+    "annualLeave": 19,
+    "usedLeave": 10,
+    "remainingLeave": 9
+  },
+  {
+    "id": "NV0012",
+    "email": "phuong.phan.huu@kpim.vn",
+    "name": "Phan Hữu Phương",
+    "gender": "Nữ",
+    "birthDate": "2002-10-20",
+    "joinDate": "2020-05-07",
+    "annualLeave": 18,
+    "usedLeave": 4,
+    "remainingLeave": 14
+  },
+  {
+    "id": "NV0013",
+    "email": "hung.le.tuan@kpim.vn",
+    "name": "Lê Tuấn Hùng",
+    "gender": "Nam",
+    "birthDate": "1986-09-19",
+    "joinDate": "2021-02-12",
+    "annualLeave": 17,
+    "usedLeave": 0,
+    "remainingLeave": 17
+  },
+  {
+    "id": "NV0014",
+    "email": "ngan.hoang.hong@kpim.vn",
+    "name": "Hoàng Hồng Ngân",
+    "gender": "Nam",
+    "birthDate": "1995-02-16",
+    "joinDate": "2020-12-10",
+    "annualLeave": 18,
+    "usedLeave": 1,
+    "remainingLeave": 17
+  },
+  {
+    "id": "NV0015",
+    "email": "long.dinh.van@kpim.vn",
+    "name": "Đinh Văn Long",
+    "gender": "Nữ",
+    "birthDate": "1985-06-03",
+    "joinDate": "2023-02-28",
+    "annualLeave": 15,
+    "usedLeave": 0,
+    "remainingLeave": 15
+  },
+  {
+    "id": "NV0016",
+    "email": "trang.dang.bao@kpim.vn",
+    "name": "Đặng Bảo Trang",
+    "gender": "Nữ",
+    "birthDate": "1977-02-21",
+    "joinDate": "2020-05-14",
+    "annualLeave": 20,
+    "usedLeave": 4,
+    "remainingLeave": 16
+  },
+  {
+    "id": "NV0017",
+    "email": "ngan.hoang.quang@kpim.vn",
+    "name": "Hoàng Quang Ngân",
+    "gender": "Nam",
+    "birthDate": "1994-02-16",
+    "joinDate": "2020-04-23",
+    "annualLeave": 15,
+    "usedLeave": 9,
+    "remainingLeave": 6
+  },
+  {
+    "id": "NV0018",
+    "email": "long.tran.hong@kpim.vn",
+    "name": "Trần Hồng Long",
+    "gender": "Nữ",
+    "birthDate": "1999-06-22",
+    "joinDate": "2023-08-08",
+    "annualLeave": 17,
+    "usedLeave": 9,
+    "remainingLeave": 8
+  },
+  {
+    "id": "NV0019",
+    "email": "anh.dinh.hai@kpim.vn",
+    "name": "Đinh Hải Anh",
+    "gender": "Nam",
+    "birthDate": "1979-08-12",
+    "joinDate": "2020-12-03",
+    "annualLeave": 20,
+    "usedLeave": 3,
+    "remainingLeave": 17
+  },
+  {
+    "id": "NV0020",
+    "email": "yen.dinh.ngoc@kpim.vn",
+    "name": "Đinh Ngọc Yến",
+    "gender": "Nam",
+    "birthDate": "1991-08-22",
+    "joinDate": "2022-12-27",
+    "annualLeave": 17,
+    "usedLeave": 8,
+    "remainingLeave": 9
+  },
+  {
+    "id": "NV0021",
+    "email": "linh.do.quang@kpim.vn",
+    "name": "Đỗ Quang Linh",
+    "gender": "Nữ",
+    "birthDate": "1983-10-12",
+    "joinDate": "2022-11-26",
+    "annualLeave": 19,
+    "usedLeave": 7,
+    "remainingLeave": 12
+  },
+  {
+    "id": "NV0022",
+    "email": "my.ngo.huu@kpim.vn",
+    "name": "Ngô Hữu My",
+    "gender": "Nữ",
+    "birthDate": "1995-02-15",
+    "joinDate": "2020-11-18",
+    "annualLeave": 15,
+    "usedLeave": 4,
+    "remainingLeave": 11
+  },
+  {
+    "id": "NV0023",
+    "email": "linh.duong.ngoc@kpim.vn",
+    "name": "Dương Ngọc Linh",
+    "gender": "Nữ",
+    "birthDate": "1992-12-02",
+    "joinDate": "2021-04-09",
+    "annualLeave": 16,
+    "usedLeave": 5,
+    "remainingLeave": 11
+  },
+  {
+    "id": "NV0024",
+    "email": "quyen.vo.bao@kpim.vn",
+    "name": "Võ Bảo Quyên",
+    "gender": "Nam",
+    "birthDate": "1989-04-21",
+    "joinDate": "2020-07-18",
+    "annualLeave": 18,
+    "usedLeave": 2,
+    "remainingLeave": 16
+  },
+  {
+    "id": "NV0025",
+    "email": "nam.tran.hong@kpim.vn",
+    "name": "Trần Hồng Nam",
+    "gender": "Nam",
+    "birthDate": "2003-07-03",
+    "joinDate": "2022-09-26",
+    "annualLeave": 19,
+    "usedLeave": 8,
+    "remainingLeave": 11
+  },
+  {
+    "id": "NV0026",
+    "email": "vy.duong.thu@kpim.vn",
+    "name": "Dương Thu Vy",
+    "gender": "Nam",
+    "birthDate": "1983-08-01",
+    "joinDate": "2021-02-14",
+    "annualLeave": 16,
+    "usedLeave": 2,
+    "remainingLeave": 14
+  },
+  {
+    "id": "NV0027",
+    "email": "my.dang.hong@kpim.vn",
+    "name": "Đặng Hồng My",
+    "gender": "Nữ",
+    "birthDate": "1977-04-15",
+    "joinDate": "2024-09-10",
+    "annualLeave": 18,
+    "usedLeave": 3,
+    "remainingLeave": 15
+  },
+  {
+    "id": "NV0028",
+    "email": "my.bui.thi@kpim.vn",
+    "name": "Bùi Thị My",
+    "gender": "Nam",
+    "birthDate": "2002-03-18",
+    "joinDate": "2024-05-19",
+    "annualLeave": 18,
+    "usedLeave": 4,
+    "remainingLeave": 14
+  },
+  {
+    "id": "NV0029",
+    "email": "nam.le.van@kpim.vn",
+    "name": "Lê Văn Nam",
+    "gender": "Nữ",
+    "birthDate": "1992-10-04",
+    "joinDate": "2023-02-23",
+    "annualLeave": 15,
+    "usedLeave": 0,
+    "remainingLeave": 15
+  },
+  {
+    "id": "NV0030",
+    "email": "giang.tran.tuan@kpim.vn",
+    "name": "Trần Tuấn Giang",
+    "gender": "Nam",
+    "birthDate": "2003-08-17",
+    "joinDate": "2022-02-07",
+    "annualLeave": 18,
+    "usedLeave": 0,
+    "remainingLeave": 18
+  },
+  {
+    "id": "NV0031",
+    "email": "trang.ngo.thi@kpim.vn",
+    "name": "Ngô Thị Trang",
+    "gender": "Nữ",
+    "birthDate": "1985-12-12",
+    "joinDate": "2021-10-16",
+    "annualLeave": 20,
+    "usedLeave": 7,
+    "remainingLeave": 13
+  },
+  {
+    "id": "NV0032",
+    "email": "thao.le.nhat@kpim.vn",
+    "name": "Lê Nhật Thảo",
+    "gender": "Nữ",
+    "birthDate": "1994-03-18",
+    "joinDate": "2021-11-18",
+    "annualLeave": 17,
+    "usedLeave": 10,
+    "remainingLeave": 7
+  },
+  {
+    "id": "NV0033",
+    "email": "khoa.le.ngoc@kpim.vn",
+    "name": "Lê Ngọc Khoa",
+    "gender": "Nữ",
+    "birthDate": "2003-04-07",
+    "joinDate": "2021-02-05",
+    "annualLeave": 16,
+    "usedLeave": 5,
+    "remainingLeave": 11
+  },
+  {
+    "id": "NV0034",
+    "email": "duc.vu.anh@kpim.vn",
+    "name": "Vũ Anh Đức",
+    "gender": "Nữ",
+    "birthDate": "1979-04-13",
+    "joinDate": "2020-02-07",
+    "annualLeave": 16,
+    "usedLeave": 7,
+    "remainingLeave": 9
+  },
+  {
+    "id": "NV0035",
+    "email": "hung.dinh.hong@kpim.vn",
+    "name": "Đinh Hồng Hùng",
+    "gender": "Nữ",
+    "birthDate": "1990-02-01",
+    "joinDate": "2020-09-20",
+    "annualLeave": 15,
+    "usedLeave": 7,
+    "remainingLeave": 8
+  },
+  {
+    "id": "NV0036",
+    "email": "tuan.vu.anh@kpim.vn",
+    "name": "Vũ Anh Tuấn",
+    "gender": "Khác",
+    "birthDate": "1996-02-19",
+    "joinDate": "2020-03-22",
+    "annualLeave": 19,
+    "usedLeave": 7,
+    "remainingLeave": 12
+  },
+  {
+    "id": "NV0037",
+    "email": "hoa.ngo.huu@kpim.vn",
+    "name": "Ngô Hữu Hoa",
+    "gender": "Nam",
+    "birthDate": "1995-12-02",
+    "joinDate": "2021-03-14",
+    "annualLeave": 16,
+    "usedLeave": 6,
+    "remainingLeave": 10
+  },
+  {
+    "id": "NV0038",
+    "email": "hoa.bui.anh@kpim.vn",
+    "name": "Bùi Anh Hoa",
+    "gender": "Nam",
+    "birthDate": "1977-12-28",
+    "joinDate": "2023-10-20",
+    "annualLeave": 19,
+    "usedLeave": 0,
+    "remainingLeave": 19
+  },
+  {
+    "id": "NV0039",
+    "email": "duc.dinh.anh@kpim.vn",
+    "name": "Đinh Anh Đức",
+    "gender": "Nam",
+    "birthDate": "1985-09-23",
+    "joinDate": "2022-07-25",
+    "annualLeave": 20,
+    "usedLeave": 2,
+    "remainingLeave": 18
+  },
+  {
+    "id": "NV0040",
+    "email": "hieu.dang.bao@kpim.vn",
+    "name": "Đặng Bảo Hiếu",
+    "gender": "Khác",
+    "birthDate": "2003-10-02",
+    "joinDate": "2021-05-22",
+    "annualLeave": 20,
+    "usedLeave": 7,
+    "remainingLeave": 13
+  },
+  {
+    "id": "NV0041",
+    "email": "hieu.do.ngoc@kpim.vn",
+    "name": "Đỗ Ngọc Hiếu",
+    "gender": "Nữ",
+    "birthDate": "1999-07-19",
+    "joinDate": "2020-02-20",
+    "annualLeave": 18,
+    "usedLeave": 5,
+    "remainingLeave": 13
+  },
+  {
+    "id": "NV0042",
+    "email": "khoa.vu.hai@kpim.vn",
+    "name": "Vũ Hải Khoa",
+    "gender": "Nam",
+    "birthDate": "1983-05-11",
+    "joinDate": "2024-09-17",
+    "annualLeave": 19,
+    "usedLeave": 0,
+    "remainingLeave": 19
+  },
+  {
+    "id": "NV0043",
+    "email": "hung.truong.thu@kpim.vn",
+    "name": "Trương Thu Hùng",
+    "gender": "Nam",
+    "birthDate": "1980-08-18",
+    "joinDate": "2024-10-02",
+    "annualLeave": 17,
+    "usedLeave": 1,
+    "remainingLeave": 16
+  },
+  {
+    "id": "NV0044",
+    "email": "quyen.vo.hong@kpim.vn",
+    "name": "Võ Hồng Quyên",
+    "gender": "Nam",
+    "birthDate": "1983-09-10",
+    "joinDate": "2022-01-01",
+    "annualLeave": 20,
+    "usedLeave": 1,
+    "remainingLeave": 19
+  },
+  {
+    "id": "NV0045",
+    "email": "vy.phan.quang@kpim.vn",
+    "name": "Phan Quang Vy",
+    "gender": "Nữ",
+    "birthDate": "1976-10-24",
+    "joinDate": "2022-02-26",
+    "annualLeave": 18,
+    "usedLeave": 8,
+    "remainingLeave": 10
+  },
+  {
+    "id": "NV0046",
+    "email": "hung.nguyen.nhat@kpim.vn",
+    "name": "Nguyễn Nhật Hùng",
+    "gender": "Nam",
+    "birthDate": "2001-04-20",
+    "joinDate": "2020-01-20",
+    "annualLeave": 18,
+    "usedLeave": 9,
+    "remainingLeave": 9
+  },
+  {
+    "id": "NV0047",
+    "email": "son.pham.bao@kpim.vn",
+    "name": "Phạm Bảo Sơn",
+    "gender": "Nam",
+    "birthDate": "1988-08-20",
+    "joinDate": "2022-11-19",
+    "annualLeave": 15,
+    "usedLeave": 6,
+    "remainingLeave": 9
+  },
+  {
+    "id": "NV0048",
+    "email": "linh.nguyen.nhat@kpim.vn",
+    "name": "Nguyễn Nhật Linh",
+    "gender": "Nữ",
+    "birthDate": "1994-06-09",
+    "joinDate": "2022-10-22",
+    "annualLeave": 15,
+    "usedLeave": 10,
+    "remainingLeave": 5
+  },
+  {
+    "id": "NV0049",
+    "email": "trang.bui.ngoc@kpim.vn",
+    "name": "Bùi Ngọc Trang",
+    "gender": "Nữ",
+    "birthDate": "1976-11-02",
+    "joinDate": "2020-05-09",
+    "annualLeave": 18,
+    "usedLeave": 6,
+    "remainingLeave": 12
+  },
+  {
+    "id": "NV0050",
+    "email": "hung.pham.khanh@kpim.vn",
+    "name": "Phạm Khánh Hùng",
+    "gender": "Nữ",
+    "birthDate": "1980-09-08",
+    "joinDate": "2022-08-16",
+    "annualLeave": 15,
+    "usedLeave": 1,
+    "remainingLeave": 14
+  },
+  {
+    "id": "NV0051",
+    "email": "vy.phan.huu@kpim.vn",
+    "name": "Phan Hữu Vy",
+    "gender": "Nữ",
+    "birthDate": "1999-04-15",
+    "joinDate": "2023-12-09",
+    "annualLeave": 15,
+    "usedLeave": 3,
+    "remainingLeave": 12
+  },
+  {
+    "id": "NV0052",
+    "email": "nam.le.anh@kpim.vn",
+    "name": "Lê Anh Nam",
+    "gender": "Nam",
+    "birthDate": "1986-10-04",
+    "joinDate": "2023-06-03",
+    "annualLeave": 19,
+    "usedLeave": 5,
+    "remainingLeave": 14
+  },
+  {
+    "id": "NV0053",
+    "email": "hoa.do.ngoc@kpim.vn",
+    "name": "Đỗ Ngọc Hoa",
+    "gender": "Nam",
+    "birthDate": "1984-08-24",
+    "joinDate": "2022-05-05",
+    "annualLeave": 20,
+    "usedLeave": 2,
+    "remainingLeave": 18
+  },
+  {
+    "id": "NV0054",
+    "email": "vy.pham.thanh@kpim.vn",
+    "name": "Phạm Thành Vy",
+    "gender": "Nam",
+    "birthDate": "2000-05-15",
+    "joinDate": "2022-04-13",
+    "annualLeave": 17,
+    "usedLeave": 0,
+    "remainingLeave": 17
+  },
+  {
+    "id": "NV0055",
+    "email": "hung.phan.nhat@kpim.vn",
+    "name": "Phan Nhật Hùng",
+    "gender": "Nữ",
+    "birthDate": "2000-04-24",
+    "joinDate": "2024-06-26",
+    "annualLeave": 16,
+    "usedLeave": 3,
+    "remainingLeave": 13
+  },
+  {
+    "id": "NV0056",
+    "email": "trang.vo.tuan@kpim.vn",
+    "name": "Võ Tuấn Trang",
+    "gender": "Nữ",
+    "birthDate": "1992-03-19",
+    "joinDate": "2022-01-21",
+    "annualLeave": 20,
+    "usedLeave": 2,
+    "remainingLeave": 18
+  },
+  {
+    "id": "NV0057",
+    "email": "ngan.tran.quang@kpim.vn",
+    "name": "Trần Quang Ngân",
+    "gender": "Nữ",
+    "birthDate": "1977-01-21",
+    "joinDate": "2021-02-24",
+    "annualLeave": 16,
+    "usedLeave": 4,
+    "remainingLeave": 12
+  },
+  {
+    "id": "NV0058",
+    "email": "tuan.nguyen.hong@kpim.vn",
+    "name": "Nguyễn Hồng Tuấn",
+    "gender": "Nam",
+    "birthDate": "2000-06-22",
+    "joinDate": "2021-08-16",
+    "annualLeave": 18,
+    "usedLeave": 3,
+    "remainingLeave": 15
+  },
+  {
+    "id": "NV0059",
+    "email": "my.vu.huu@kpim.vn",
+    "name": "Vũ Hữu My",
+    "gender": "Nữ",
+    "birthDate": "1995-01-17",
+    "joinDate": "2022-12-01",
+    "annualLeave": 18,
+    "usedLeave": 2,
+    "remainingLeave": 16
+  },
+  {
+    "id": "NV0060",
+    "email": "ngan.vu.van@kpim.vn",
+    "name": "Vũ Văn Ngân",
+    "gender": "Nam",
+    "birthDate": "1987-07-17",
+    "joinDate": "2022-05-02",
+    "annualLeave": 18,
+    "usedLeave": 10,
+    "remainingLeave": 8
+  }
+];
+
+    const state = {
+      search: "",
+      gender: "all",
+      sortKey: "id",
+      sortDir: "asc",
+    };
+
+    const genderOrder = { "Nam": 1, "Nữ": 2, "Khác": 3 };
+
+    function formatDate(value) {
+      if (!value) return "";
+      const date = new Date(value + "T00:00:00");
+      if (Number.isNaN(date.getTime())) return value;
+      const dd = String(date.getDate()).padStart(2, "0");
+      const mm = String(date.getMonth() + 1).padStart(2, "0");
+      const yyyy = date.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    }
+
+    function formatNumber(value) {
+      return new Intl.NumberFormat("vi-VN").format(value);
+    }
+
+    function getSummary(data) {
+      const total = data.length;
+      const male = data.filter(item => item.gender === "Nam").length;
+      const female = data.filter(item => item.gender === "Nữ").length;
+      const other = data.filter(item => item.gender === "Khác").length;
+      const totalRemaining = data.reduce((sum, item) => sum + Number(item.remainingLeave || 0), 0);
+      const avgRemaining = total ? (totalRemaining / total) : 0;
+      const totalUsed = data.reduce((sum, item) => sum + Number(item.usedLeave || 0), 0);
+      const totalAnnual = data.reduce((sum, item) => sum + Number(item.annualLeave || 0), 0);
+      const lowLeave = data.filter(item => Number(item.remainingLeave) <= 3).length;
+      return { total, male, female, other, totalRemaining, avgRemaining, totalUsed, totalAnnual, lowLeave };
+    }
+
+    function renderCards(summary) {
+      const cards = [
+        {
+          label: "Tổng số nhân sự",
+          value: formatNumber(summary.total),
+          note: "Toàn bộ hồ sơ nhân sự hiện có",
+          icon: "NS",
+          iconClass: "icon-red"
+        },
+        {
+          label: "Nhân sự Nam",
+          value: formatNumber(summary.male),
+          note: `${summary.total ? Math.round(summary.male / summary.total * 100) : 0}% tổng nhân sự`,
+          icon: "N",
+          iconClass: "icon-green"
+        },
+        {
+          label: "Nhân sự Nữ",
+          value: formatNumber(summary.female),
+          note: `${summary.total ? Math.round(summary.female / summary.total * 100) : 0}% tổng nhân sự`,
+          icon: "NỮ",
+          iconClass: "icon-red"
+        },
+        {
+          label: "Nhân sự Khác",
+          value: formatNumber(summary.other),
+          note: "Nhóm giới tính khác được khai báo",
+          icon: "K",
+          iconClass: "icon-yellow"
+        },
+        {
+          label: "Tổng ngày phép còn lại",
+          value: formatNumber(summary.totalRemaining),
+          note: `Trung bình ${summary.avgRemaining.toFixed(1)} ngày/người`,
+          icon: "P",
+          iconClass: "icon-green"
+        }
+      ];
+
+      document.getElementById("kpiCards").innerHTML = cards.map(card => `
+        <article class="card kpi">
+          <div class="kpi-head">
+            <p class="kpi-label">${card.label}</p>
+            <span class="kpi-icon ${card.iconClass}">${card.icon}</span>
+          </div>
+          <p class="kpi-value">${card.value}</p>
+          <div class="kpi-note">${card.note}</div>
+        </article>
+      `).join("");
+    }
+
+    function renderDonut(summary) {
+      const chartData = [
+        { label: "Nam", value: summary.male, color: "#014C34" },
+        { label: "Nữ", value: summary.female, color: "#AD1C3E" },
+        { label: "Khác", value: summary.other, color: "#D9B100" },
+      ];
+
+      const total = chartData.reduce((sum, item) => sum + item.value, 0);
+      const radius = 72;
+      const circumference = 2 * Math.PI * radius;
+      let offset = 0;
+
+      const segments = chartData.map(item => {
+        const segmentLength = total ? (item.value / total) * circumference : 0;
+        const circle = `
+          <circle
+            cx="110"
+            cy="110"
+            r="${radius}"
+            fill="none"
+            stroke="${item.color}"
+            stroke-width="24"
+            stroke-linecap="butt"
+            stroke-dasharray="${segmentLength} ${circumference - segmentLength}"
+            stroke-dashoffset="${-offset}"
+          ></circle>
+        `;
+        offset += segmentLength;
+        return circle;
+      }).join("");
+
+      document.getElementById("donutSegments").innerHTML = segments;
+      document.getElementById("donutTotal").textContent = formatNumber(total);
+
+      document.getElementById("chartLegend").innerHTML = chartData.map(item => {
+        const pct = total ? ((item.value / total) * 100).toFixed(1) : "0.0";
+        return `
+          <div class="legend-item">
+            <div class="legend-left">
+              <span class="dot" style="background:${item.color}"></span>
+              <div>
+                <div class="legend-name">${item.label}</div>
+                <div class="legend-sub">${pct}% cơ cấu nhân sự</div>
+              </div>
+            </div>
+            <div class="legend-value">${formatNumber(item.value)}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderLeaveSummary(summary) {
+      const usageRate = summary.totalAnnual ? ((summary.totalUsed / summary.totalAnnual) * 100).toFixed(1) : "0.0";
+      const items = [
+        {
+          label: "Tổng ngày phép năm",
+          value: formatNumber(summary.totalAnnual),
+          desc: "Tổng hạn mức phép năm của toàn bộ nhân sự"
+        },
+        {
+          label: "Đã sử dụng",
+          value: formatNumber(summary.totalUsed),
+          desc: `${usageRate}% trên tổng hạn mức phép`
+        },
+        {
+          label: "Còn lại bình quân",
+          value: summary.avgRemaining.toFixed(1),
+          desc: "Số ngày phép còn lại trung bình mỗi nhân sự"
+        },
+        {
+          label: "Cần theo dõi",
+          value: formatNumber(summary.lowLeave),
+          desc: "Nhân sự có ngày phép còn lại nhỏ hơn hoặc bằng 3"
+        }
+      ];
+
+      document.getElementById("leaveSummary").innerHTML = items.map(item => `
+        <div class="mini-stat">
+          <div class="mini-label">${item.label}</div>
+          <div class="mini-value">${item.value}</div>
+          <div class="mini-desc">${item.desc}</div>
+        </div>
+      `).join("");
+    }
+
+    function compareValues(a, b, key) {
+      const numericKeys = ["annualLeave", "usedLeave", "remainingLeave"];
+      const dateKeys = ["birthDate", "joinDate"];
+
+      if (numericKeys.includes(key)) {
+        return Number(a[key]) - Number(b[key]);
+      }
+
+      if (dateKeys.includes(key)) {
+        return new Date(a[key]) - new Date(b[key]);
+      }
+
+      if (key === "gender") {
+        return (genderOrder[a[key]] || 99) - (genderOrder[b[key]] || 99);
+      }
+
+      return String(a[key] ?? "").localeCompare(String(b[key] ?? ""), "vi", { sensitivity: "base", numeric: true });
+    }
+
+    function getFilteredData() {
+      const keyword = state.search.trim().toLowerCase();
+      const filtered = rawData.filter(item => {
+        const matchedKeyword = !keyword ||
+          item.id.toLowerCase().includes(keyword) ||
+          item.name.toLowerCase().includes(keyword) ||
+          item.email.toLowerCase().includes(keyword);
+
+        const matchedGender = state.gender === "all" || item.gender === state.gender;
+        return matchedKeyword && matchedGender;
+      });
+
+      filtered.sort((a, b) => {
+        const base = compareValues(a, b, state.sortKey);
+        return state.sortDir === "asc" ? base : -base;
+      });
+
+      return filtered;
+    }
+
+    function genderBadge(gender) {
+      if (gender === "Nam") return `<span class="badge badge-male">Nam</span>`;
+      if (gender === "Nữ") return `<span class="badge badge-female">Nữ</span>`;
+      return `<span class="badge badge-other">Khác</span>`;
+    }
+
+    function leaveBadge(value) {
+      const val = Number(value) || 0;
+      if (val <= 1) return `<span class="badge leave-badge leave-danger">${formatNumber(val)} ngày</span>`;
+      if (val <= 3) return `<span class="badge leave-badge leave-warn">${formatNumber(val)} ngày</span>`;
+      return `<span class="badge leave-badge leave-safe">${formatNumber(val)} ngày</span>`;
+    }
+
+    function updateSortIndicators() {
+      document.querySelectorAll("[data-indicator]").forEach(el => {
+        const key = el.getAttribute("data-indicator");
+        if (key !== state.sortKey) {
+          el.textContent = "↕";
+          return;
+        }
+        el.textContent = state.sortDir === "asc" ? "↑" : "↓";
+      });
+    }
+
+    function renderTable() {
+      const data = getFilteredData();
+      const tbody = document.getElementById("tableBody");
+      document.getElementById("resultCount").textContent = `${formatNumber(data.length)} nhân sự`;
+
+      if (!data.length) {
+        tbody.innerHTML = `<tr><td colspan="9" class="empty">Không tìm thấy dữ liệu phù hợp với điều kiện lọc.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.map(item => `
+        <tr>
+          <td class="mono">${item.id}</td>
+          <td class="name-cell">${item.name}</td>
+          <td class="email">${item.email}</td>
+          <td>${genderBadge(item.gender)}</td>
+          <td>${formatDate(item.birthDate)}</td>
+          <td>${formatDate(item.joinDate)}</td>
+          <td>${formatNumber(item.annualLeave)}</td>
+          <td>${formatNumber(item.usedLeave)}</td>
+          <td>${leaveBadge(item.remainingLeave)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function bindEvents() {
+      document.getElementById("searchInput").addEventListener("input", (e) => {
+        state.search = e.target.value || "";
+        renderTable();
+      });
+
+      document.getElementById("genderFilter").addEventListener("change", (e) => {
+        state.gender = e.target.value;
+        renderTable();
+      });
+
+      document.querySelectorAll("thead th[data-key]").forEach(th => {
+        th.addEventListener("click", () => {
+          const key = th.getAttribute("data-key");
+          if (state.sortKey === key) {
+            state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
+          } else {
+            state.sortKey = key;
+            state.sortDir = "asc";
+          }
+          updateSortIndicators();
+          renderTable();
+        });
+      });
+    }
+
+    function init() {
+      const summary = getSummary(rawData);
+      renderCards(summary);
+      renderDonut(summary);
+      renderLeaveSummary(summary);
+      bindEvents();
+      updateSortIndicators();
+      renderTable();
+    }
+
+    init();
+  </script>
+</body>
+</html>
